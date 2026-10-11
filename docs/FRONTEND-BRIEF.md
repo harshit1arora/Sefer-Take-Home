@@ -28,25 +28,18 @@ Build a functional, responsive single-page application called **Sefer Entry Work
 
 **Page introduction**
 - Small uppercase label: `CUSTOMS ENTRY WORKSPACE`
-- Heading: `From shipment documents to a filing-ready draft.`
+- Heading: `Turn shipping documents into an entry.`
 - Supporting text explaining that Sefer extracts shipment information, reconciles documents and prepares an entry for broker review.
 - Primary action: `New shipment`.
 
 **Main workspace**
-Use a clean two-column layout on desktop, stacking vertically on mobile.
+Use a compact, responsive four-step workflow:
+1. Upload the commercial invoice, packing list and bill of lading using a drag-and-drop PDF area. Show uploaded filename, document type and file size.
+2. Show the extracted shipment overview and editable invoice-line table after the service responds.
+3. Keep conflicts, missing information, valuation questions and explicit broker approvals together in a prominent review section.
+4. Show the generated XML draft, backend-confirmed validation results, and download action. Keep readiness blockers visible; do not imply official-schema validation or customs acceptance unless confirmed.
 
-Left column — Documents:
-- A simple drag-and-drop PDF upload area.
-- Support commercial invoices, packing lists and bills of lading.
-- Show uploaded filename, document type, file size and processing state.
-- Include `Add documents` and `Process shipment` actions.
-- Show clear progress states: Uploaded, Extracting, Reconciling, Generating XML, Validating.
-
-Right column — Shipment overview:
-- Invoice number, buyer, consignee, origin, destination and bill of lading.
-- Invoice value, freight, insurance, package count and shipment weight.
-- An editable line-item table with description, HS code, quantity, unit price, amount and origin.
-- Keep the information compact, aligned and easy to scan.
+The compact step indicator should reflect actual uploaded, processing, review and XML state. Before upload, show the upload area and a short workflow description. Avoid a separate processing-status panel and oversized validation dashboard. Keep the layout responsive and preserve existing API and PDF behavior.
 
 **Review and reconciliation**
 Below the main workspace, add a section titled `Review before filing`.

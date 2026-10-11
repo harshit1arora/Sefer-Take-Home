@@ -321,3 +321,56 @@ body { font-size: 15px; }
   .finding-details p { font-size: 12px; }
 }
 @media (max-width: 760px) { .valuation-component { grid-template-columns: 1fr; gap: 3px; } .validation-detail, .validation-errors { margin-left: 0; } }
+
+/* Compact, state-driven entry workflow. */
+.page-intro { margin-bottom: 26px; }
+.page-intro h1 { max-width: 800px; }
+.workflow-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); list-style: none; gap: 14px; padding: 0; margin: 0 0 29px; }
+.workflow-step { display: flex; align-items: center; gap: 10px; min-width: 0; border-top: 2px solid var(--border); padding-top: 12px; color: var(--muted-foreground); font-size: 12px; line-height: 1.4; }
+.workflow-step-number { display: inline-flex; flex: 0 0 25px; width: 25px; height: 25px; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 50%; font-size: 11px; }
+.workflow-step.current { border-color: var(--primary); color: var(--foreground); font-weight: 550; }
+.workflow-step.current .workflow-step-number { border-color: var(--primary); background: var(--primary); color: var(--primary-foreground); }
+.workflow-step.complete { border-color: var(--confirmed); color: var(--foreground); }
+.workflow-step.complete .workflow-step-number { border-color: var(--confirmed); color: var(--confirmed); }
+.service-note { margin: -12px 0 20px; color: var(--muted-foreground); font-size: 12px; }
+.workflow-content { min-width: 0; }
+.documents-section { max-width: 850px; padding: 0; border-right: 0; }
+.upload-area { min-height: 215px; justify-content: center; }
+.process-area { text-align: left; border-bottom: 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.process-button { width: auto; min-width: 220px; }
+.process-area p { margin: 0; }
+.overview-step { border-top: 1px solid var(--border); margin-top: 30px; padding-top: 25px; }
+.overview-step-label { margin-bottom: 4px; }
+.review-section { margin-top: 35px; padding-top: 27px; }
+.review-section > .section-heading h2, .xml-section h2 { font-size: 24px; }
+.review-section .valuation-section { margin-top: 28px; padding-top: 25px; }
+.review-continue { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 23px; padding-top: 18px; border-top: 1px solid var(--border); }
+.review-continue p { color: var(--muted-foreground); font-size: 12px; line-height: 1.6; }
+.review-continue button { flex-shrink: 0; }
+.xml-section { margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--border); }
+.xml-section .section-heading { margin-bottom: 16px; }
+.xml-section .xml-actions button { height: 36px; font-size: 13px; }
+.xml-validation { display: flex; align-items: flex-start; gap: 18px; flex-wrap: wrap; margin-bottom: 14px; padding: 11px 14px; border: 1px solid var(--border); border-radius: 5px; }
+.xml-validation > strong { padding-top: 3px; font-size: 12px; font-weight: 550; }
+.xml-validation .validation-status { display: flex; flex-wrap: wrap; gap: 14px 22px; }
+.xml-validation .validation-item { padding: 1px 0; border: 0; font-size: 12px; }
+.xml-validation .validation-value { margin-left: 2px; font-size: 12px; }
+.xml-validation .validation-item .confirmed-status:last-child { margin-left: 2px; font-size: 12px; }
+.xml-validation .validation-detail, .xml-validation .validation-errors { flex-basis: 100%; margin: 4px 0 0 23px; }
+.xml-disclosure { margin-top: 12px; color: var(--muted-foreground); font-size: 12px; line-height: 1.7; }
+.code-panel pre { height: min(52vh, 490px); font-size: 12px; line-height: 1.85; }
+.line-number { font-size: 11px; }
+
+@media (max-width: 760px) {
+  .workflow-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 23px; }
+  .workflow-step { font-size: 11px; }
+  .upload-area { min-height: 190px; }
+  .process-area { align-items: stretch; }
+  .process-button { width: 100%; }
+  .process-area p { width: 100%; }
+  .review-continue { align-items: flex-start; flex-direction: column; }
+  .xml-section .section-heading { align-items: flex-start; }
+  .xml-section .xml-actions { width: 100%; }
+  .xml-section .xml-actions button { flex: 1; }
+  .xml-validation { flex-direction: column; gap: 7px; }
+}
