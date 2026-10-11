@@ -237,6 +237,7 @@
 .activity-list time { margin-left: auto; font-size: 10px; color: var(--subtle-label); }
 .activity-list p { font-size: 12px; }
 .activity-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--brand-accent); }
+
 @media (min-width: 1440px) { .main-content { max-width: 1320px; } .workspace-grid { grid-template-columns: 350px minmax(0,1fr); gap: 45px; } .documents-section { padding-right: 37px; } }
 @media (max-width: 1050px) { .nav-inner { padding: 0 30px; } .workspace-name { display: none; } .main-content { padding: 35px 30px 0; } .workspace-grid { grid-template-columns: 285px minmax(0,1fr); gap: 25px; } .documents-section { padding-right: 23px; } .page-intro h1 { font-size: 32px; } .value-grid strong { font-size: 16px; } .shipment-metrics { gap: 13px; } .line-table { min-width: 540px; } .xml-layout { grid-template-columns: minmax(0,1fr) 230px; gap: 20px; } }
 @media (max-width: 760px) { .navigation { height: auto; } .nav-inner { flex-wrap: wrap; padding: 14px 22px 0; gap: 5px; } .wordmark { font-size: 32px; height: 35px; } .nav-links { order: 3; width: 100%; height: 45px; gap: 26px; margin-top: 7px; } .nav-link { font-size: 11px; } .nav-profile { gap: 9px; } .nav-divider { display: none; } .main-content { padding: 28px 22px 0; } .breadcrumb { margin-bottom: 26px; } .page-intro { flex-direction: column; align-items: flex-start; gap: 17px; margin-bottom: 24px; } .page-intro h1 { font-size: 30px; margin-top: 12px; } .intro-copy { font-size: 11px; } .new-shipment { margin-top: 0; } .status-banner { flex-wrap: wrap; padding: 12px; gap: 12px; margin-bottom: 29px; } .status-banner-content { align-items: flex-start; font-size: 10px; line-height: 1.8; } .status-banner-content svg { margin-top: 2px; } .workspace-grid { display: flex; flex-direction: column; gap: 32px; } .documents-section { border-right: 0; padding: 0; } .document-note { display: none; } .processing-status ol { display: grid; grid-template-columns: 1fr 1fr; column-gap: 18px; } .processing-status li { font-size: 10px; } .processing-status .step-state { font-size: 9px; } .summary-grid { gap: 22px 14px; } .shipment-identity h3 { font-size: 18px; } .value-grid strong { font-size: 17px; } .line-items { margin-top: 19px; } .review-section { margin-top: 32px; padding-top: 25px; } .section-meta { font-size: 9px; } .finding-row { grid-template-columns: 83px minmax(0, 1fr); gap: 11px; align-items: start; } .finding-row > button { grid-column: 2; justify-self: start; padding-left: 0; height: 22px; } .finding-severity { font-size: 9px; padding-top: 2px; } .xml-section .section-heading { flex-wrap: wrap; gap: 19px; } .xml-layout { grid-template-columns: 1fr; } .code-toolbar { font-size: 9px; padding: 10px; } .code-toolbar span:last-child { font-size: 9px; } .validation-panel { margin-top: 5px; } .validation-panel > p { margin-bottom: 9px; } .validation-note { max-width: 460px; } .app-footer { flex-wrap: wrap; gap: 13px; margin-top: 32px; font-size: 9px; } .form-grid { grid-template-columns: 1fr; } .shipment-list-item { flex-wrap: wrap; gap: 18px; } .shipment-list-item > div { min-width: 100%; } .activity-list li { gap: 12px; } .activity-list p { font-size: 10px; } .activity-list time { font-size: 9px; } }
@@ -259,4 +260,64 @@
 .assumption-list ul { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 10px; } .assumption-list small { color: var(--muted-foreground); line-height: 1.7; }
 .validation-detail { font-size: 10px; line-height: 1.7; color: var(--muted-foreground); margin: 2px 0 8px 26px; }
 .validation-errors { font-size: 9px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; margin: 4px 0 8px 26px; max-height: 160px; overflow: auto; color: var(--foreground); background: var(--muted); padding: 8px; border-radius: 3px; }
+
+/* Keep the workspace readable at normal laptop and mobile viewing distances. */
+body { font-size: 15px; }
+.nav-inner { gap: 30px; }
+.wordmark { height: 50px; }
+.sefer-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--foreground); font-size: 25px; font-weight: 650; line-height: 1; }
+.sefer-brand img { display: block; width: 40px; height: 40px; object-fit: contain; }
+.wordmark .sefer-brand { font-size: 25px; }
+.footer-brand .sefer-brand { font-size: 20px; }
+.footer-brand .sefer-brand img { width: 32px; height: 32px; }
+.breadcrumb { font-size: 12px; }
+.eyebrow, .section-heading > .eyebrow, .shipment-identity .eyebrow { font-size: 11px; }
+.page-intro h1, .list-view h1 { font-size: 40px; }
+.intro-copy, .list-intro { font-size: 15px; }
+.new-shipment, .nav-link { font-size: 14px; }
+.workspace-name { font-size: 13px; }
+.status-banner-content { font-size: 13px; }
+.section-heading h2 { font-size: 18px; }
+.section-heading button, .finding-row button, .xml-section .xml-actions button { font-size: 12px; }
+.upload-area p, .document-details p { font-size: 14px; }
+.upload-area .small, .upload-footnote, .document-details > span, .document-details > .document-state { font-size: 11px; }
+.upload-area button, .process-button { font-size: 13px; }
+.process-area p { font-size: 11px; }
+.processing-status li, .processing-status .step-state { font-size: 12px; }
+.summary-grid dt, .value-grid span { font-size: 11px; }
+.summary-grid dd { font-size: 14px; }
+.value-grid strong { font-size: 21px; }
+.shipment-metrics { font-size: 11px; }
+.line-table { font-size: 12px; }
+.line-table th, .line-table tfoot td, .line-table input { font-size: 11px; }
+.missing-value, .table-note { font-size: 11px; }
+.section-meta, .finding-severity { font-size: 12px; }
+.finding-details h3 { font-size: 14px; }
+.finding-details p { font-size: 13px; }
+.code-toolbar, .code-toolbar span:last-child { font-size: 11px; }
+.code-panel pre { font-size: 12px; }
+.line-number { font-size: 10px; }
+.validation-panel h3 { font-size: 14px; }
+.validation-panel > p, .validation-item, .validation-value, .validation-item .confirmed-status:last-child,
+.validation-note p, .validation-detail { font-size: 12px; }
+.validation-errors { font-size: 11px; }
+.app-footer { font-size: 12px; }
+.inline-error, .empty-documents, .empty-findings, .empty-table { font-size: 13px; }
+.empty-overview p, .empty-xml span, .form-field, .settings-info > div, .shipment-list-item p,
+.activity-list time { font-size: 12px; }
+.form-field input, .form-field select { font-size: 14px; }
+.activity-list p, .valuation-intro, .valuation-component, .valuation-excluded, .assumption-list { font-size: 13px; }
+.valuation-component small, .assumption-list small { font-size: 12px; }
+.provenance-tag { font-size: 11px; }
+.approve-row { font-size: 12px; }
+
+@media (max-width: 760px) {
+  .wordmark .sefer-brand { font-size: 23px; }
+  .sefer-brand img { width: 36px; height: 36px; }
+  .nav-link { font-size: 13px; }
+  .page-intro h1, .list-view h1 { font-size: 34px; }
+  .intro-copy { font-size: 14px; }
+  .status-banner-content { font-size: 12px; }
+  .finding-details p { font-size: 12px; }
+}
 @media (max-width: 760px) { .valuation-component { grid-template-columns: 1fr; gap: 3px; } .validation-detail, .validation-errors { margin-left: 0; } }

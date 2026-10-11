@@ -4,6 +4,7 @@ import { Plus, ChevronRight, Info, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Navigation, type WorkspaceView } from '@/components/entry/Navigation';
+import { SeferBrand } from '@/components/entry/SeferBrand';
 import { PdfUpload } from '@/components/entry/PdfUpload';
 import { ShipmentSummary, formatMoney } from '@/components/entry/ShipmentSummary';
 import { LineItemTable } from '@/components/entry/LineItemTable';
@@ -16,9 +17,9 @@ import type { BrokerForm, EntryResponse, Finding, ProcessingStage, ServiceStatus
 
 export const Route = createFileRoute('/')({
   head: () => ({ meta: [
-    { title: 'Sefer Entry Workspace — Customs Entry Automation' },
+    { title: 'Sefer Entry Workspace | Customs Entry Automation' },
     { name: 'description', content: 'Review shipment documents, reconcile customs entry details and prepare an entry XML draft in Sefer’s broker workspace.' },
-    { property: 'og:title', content: 'Sefer Entry Workspace — Customs Entry Automation' },
+    { property: 'og:title', content: 'Sefer Entry Workspace | Customs Entry Automation' },
     { property: 'og:description', content: 'From shipment documents to a filing-ready draft. A focused workspace for customs brokers, with honest document and validation status.' },
     { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary_large_image' },
   ] }),
@@ -123,7 +124,7 @@ function Index() {
   const findings = shipment ? entry?.findings ?? [] : [];
   const banner = describeService(service);
   const settingsService = service === 'checking' ? 'Checking…' : service === null ? 'Not reachable' : service.extraction.configured ? `Connected · ${service.extraction.model}` : 'Connected · model key missing';
-  const settingsValidation = service === 'checking' || service === null ? '—' : service.validation.backend === 'none' ? 'No validator available' : `${service.validation.backend} · ${service.validation.schema} schema${service.validation.complete ? '' : ' (partial)'}`;
+  const settingsValidation = service === 'checking' ? 'Checking' : service === null ? 'Not available' : service.validation.backend === 'none' ? 'No validator available' : `${service.validation.backend} · ${service.validation.schema} schema${service.validation.complete ? '' : ' (partial)'}`;
   return <><Navigation view={view} onView={setView} onSettings={openSettings}/><main className="main-content">
     <div className="breadcrumb"><span>Workspace</span><ChevronRight size={11}/><span>{view === 'workspace' ? 'Shipment entry' : view === 'shipments' ? 'Shipments' : 'Activity'}</span></div>
     {view === 'workspace' ? <>
@@ -134,7 +135,7 @@ function Index() {
       {entry && <div ref={brokerRef}><ValuationPanel entry={entry} approved={approved} onApprove={(key, value) => { setApproved(current => ({...current,[key]:value})); setStale(true); }} broker={broker} onBroker={(key, value) => { setBroker(current => ({...current,[key]:value})); setStale(true); }} disabled={busy}/></div>}
       <XmlViewer entry={entry} stale={stale} busy={busy} onGenerate={regenerate}/>
     </> : view === 'shipments' ? <section className="list-view"><span className="eyebrow">ENTRY WORKSPACE</span><div className="page-intro"><div><h1>Shipments</h1><p className="list-intro">Current-session shipment drafts.</p></div><Button onClick={() => setDialog('new')}><Plus/> New shipment</Button></div>{shipment ? <div className="shipment-list-item"><div><span className="eyebrow">BROKER REVIEW</span><h3>{shipment.invoiceNumber || 'Untitled shipment'}</h3><p>{shipment.buyer} · {shipment.destination}</p></div><span>{formatMoney(shipment.invoiceValue)}</span><Button variant="outline" size="sm" onClick={() => setView('workspace')}>Open workspace <ArrowRight/></Button></div> : <div className="empty-overview"><h3>No shipment drafts yet.</h3><Button variant="outline" onClick={() => setView('workspace')}>Go to workspace <ArrowRight/></Button></div>}</section> : <section className="list-view"><span className="eyebrow">WORKSPACE HISTORY</span><h1>Activity</h1><p className="list-intro">Actions in this session. No customs filings have been submitted.</p>{activity.length ? <ul className="activity-list">{activity.map(item => <li key={item.id}><span className="activity-dot"/><p>{item.message}</p><time>{item.time}</time></li>)}</ul> : <div className="empty-overview"><h3>No activity yet.</h3><p>Shipment actions will appear here during this session.</p></div>}</section>}
-    <footer className="app-footer"><div><span className="footer-brand">sefer<span>.</span></span><span>Customs, without the complexity.</span></div><span>Broker review required. No entry has been filed.</span></footer>
+    <footer className="app-footer"><div><span className="footer-brand"><SeferBrand/></span><span>Customs, without the complexity.</span></div><span>Broker review required. No entry has been filed.</span></footer>
   </main>
   <Dialog open={dialog !== null} onOpenChange={open => { if (!open) setDialog(null); }}><DialogContent className="edit-dialog"><DialogHeader><DialogTitle>{dialog === 'edit' ? 'Edit shipment details' : dialog === 'new' ? 'Start a new shipment?' : 'Workspace settings'}</DialogTitle><DialogDescription>{dialog === 'edit' ? 'Confirm details against source documents. Edits are recorded and need a regenerated XML draft.' : dialog === 'new' ? 'This clears the current draft and uploaded documents. Download your XML first if you need to keep it.' : 'Sefer Entry Workspace · Current session'}</DialogDescription></DialogHeader>
     {dialog === 'settings' && <><dl className="settings-info"><div><dt>Workspace</dt><dd>Broker workspace</dd></div><div><dt>Entry service</dt><dd>{settingsService}</dd></div><div><dt>XML validation</dt><dd>{settingsValidation}</dd></div><div><dt>NetCHB</dt><dd>Not connected · nothing is submitted</dd></div><div><dt>Data storage</dt><dd>Current session only · uploads are not stored</dd></div></dl><div className="dialog-actions"><Button onClick={() => setDialog(null)}>Done</Button></div></>}
