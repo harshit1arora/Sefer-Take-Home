@@ -1,0 +1,168 @@
+{
+  "invoice": {
+    "number": "HLAS/BP/26-0912",
+    "date": "2026-09-12",
+    "currency": "USD",
+    "incoterm": "CIF TACOMA, WA",
+    "freight": 3850,
+    "insurance": 185,
+    "statedTotal": 27270,
+    "statedFobTotal": 23235,
+    "statedSubtotalCarriedForward": 21975,
+    "seller": {
+      "name": "HARBORLINE APPAREL SOURCING LIMITED",
+      "address1": "Unit 100, 10/F, Example Industrial Building, 100 Example Street, Hong Kong",
+      "city": "Hong Kong",
+      "country": "HK"
+    },
+    "buyer": {
+      "name": "BLUEPEAK OUTFITTERS, INC.",
+      "address1": "100 Example Street, Suite 300",
+      "city": "Portland",
+      "state": "OR",
+      "zip": "97210",
+      "country": "US"
+    },
+    "shipTo": {
+      "name": "SUMMIT FULFILLMENT PARTNERS LLC",
+      "address1": "200 Example Avenue South, Dock 4",
+      "city": "Kent",
+      "state": "WA",
+      "zip": "98032",
+      "country": "US"
+    },
+    "po": "BP-26-0918",
+    "portOfLoading": "CAT LAI, HO CHI MINH CITY, VN",
+    "portOfDischarge": "TACOMA, WA, U.S.A.",
+    "lines": [
+      {
+        "lineNo": 1,
+        "style": "BP-T101",
+        "description": "MEN'S CREW NECK SHORT SLEEVE T-SHIRT 100% Cotton single jersey, 160 GSM, knitted Colours: Black / White / Heather Navy Size ratio S-M-L-XL-XXL : 1-3-3-2-1",
+        "hts": "6109.10",
+        "quantity": 2400,
+        "unit": "PCS",
+        "unitPrice": 2.85,
+        "statedAmount": 6480,
+        "originCountry": "VN",
+        "isFreeOfCharge": false
+      },
+      {
+        "lineNo": 2,
+        "style": "BP-H205",
+        "description": "WOMEN'S PULLOVER HOODIE W/ KANGAROO POCKET 60% Cotton 40% Polyester brushed fleece, 280 GSM, knitted Colours: Oatmeal / Sage Size ratio XS-S-M-L-XL : 1-2-3-3-3",
+        "hts": "6110.20",
+        "quantity": 1200,
+        "unit": "PCS",
+        "unitPrice": 7.4,
+        "statedAmount": 8880,
+        "originCountry": "VN",
+        "isFreeOfCharge": false
+      },
+      {
+        "lineNo": 3,
+        "style": "BP-C330",
+        "description": "MEN'S SLIM FIT CHINO TROUSERS 98% Cotton 2% Elastane stretch twill, 245 GSM, woven Colours: Khaki / Olive / Navy Waist 30-32-34-36-38 : 1-2-3-3-1",
+        "hts": "6203.42",
+        "quantity": 900,
+        "unit": "PCS",
+        "unitPrice": 6.95,
+        "statedAmount": 6255,
+        "originCountry": "VN",
+        "isFreeOfCharge": false
+      },
+      {
+        "lineNo": 4,
+        "style": "W-B220",
+        "description": "WOMEN'S LONG SLEEVE BLOUSE, V-NECK 100% Polyester crepe de chine, woven Colours: Ivory / Black Size ratio XS-S-M-L-XL : 1-2-3-3-1 CMT price, see note (*)",
+        "hts": "6206.40",
+        "quantity": 600,
+        "unit": "PCS",
+        "unitPrice": 2.1,
+        "statedAmount": 1260,
+        "originCountry": "VN",
+        "isFreeOfCharge": false,
+        "assistValue": 4180
+      },
+      {
+        "lineNo": 5,
+        "style": "BP-P118S",
+        "description": "WOMEN'S SHORT SLEEVE POLO SHIRT - SAMPLES 100% Cotton pique, knitted FOC SAMPLES - NO COMMERCIAL VALUE Value for customs purpose only USD 1.00/pc (Origin: Bangladesh)",
+        "hts": "6106.10",
+        "quantity": 24,
+        "unit": "PCS",
+        "unitPrice": 1,
+        "statedAmount": 24,
+        "originCountry": "BD",
+        "isFreeOfCharge": true,
+        "customsValue": 24
+      }
+    ]
+  },
+  "packing": {
+    "number": "EXG-PL-2609-117",
+    "cartons": 138,
+    "grossKg": 1888,
+    "netKg": 1734.5,
+    "cbm": 13.58,
+    "lines": [
+      {
+        "style": "BP-T101",
+        "pcs": 2400
+      },
+      {
+        "style": "BP-H205",
+        "pcs": 1176
+      },
+      {
+        "style": "BP-C330",
+        "pcs": 900
+      },
+      {
+        "style": "W-B220",
+        "pcs": 600
+      },
+      {
+        "style": "BP-P118S",
+        "pcs": 24
+      }
+    ]
+  },
+  "bol": {
+    "houseBill": "BMLVHCM26090001",
+    "masterBill": "OPLUSGN26090001",
+    "houseScac": "BMLV",
+    "masterScac": "OPLU",
+    "vessel": "PACIFIC ARGOS",
+    "voyage": "041E",
+    "portOfLoading": "CAT LAI, HCMC, VN",
+    "portOfDischarge": "TACOMA, WA, USA",
+    "onBoardDate": "2026-09-24",
+    "goodsDescription": "138 CARTONS OF WEARING APPAREL - MEN'S AND LADIES' KNIT AND WOVEN GARMENTS (T-SHIRTS, HOODIES, TROUSERS, BLOUSES, POLO SAMPLES)",
+    "containers": [
+      {
+        "number": "OPLU 104172 3",
+        "seal": "EXL7731482",
+        "size": "20'GP",
+        "printedNumber": "OPLU1041726",
+        "correctionNote": "Original printed number OPLU1041726 struck through, with handwritten OPLU 104172 3 above it."
+      }
+    ],
+    "packages": 138,
+    "packageUnit": "CTN",
+    "grossKg": 1930
+  },
+  "factory": {
+    "name": "MEKONG GARMENT JSC",
+    "address1": "Lô C7-C8, Đường số 9, Example Industrial Park, Di An Ward",
+    "city": "Di An City",
+    "state": "Binh Duong Province",
+    "country": "VN"
+  },
+  "extractionNotes": [
+    "Invoice date 12/09/2026 interpreted as 2026-09-12 based on timeline with B/L on-board date 2026-09-24 and P/L date 2026-09-20.",
+    "Item 4 includes assist value of USD 4,180.00 for fabric supplied free of charge by buyer.",
+    "Item 5 origin is Bangladesh as stated on invoice and packing list, while items 1-4 originate in Vietnam.",
+    "Packing list records 1,176 pcs for style BP-H205 whereas invoice lists 1,200 pcs."
+  ]
+}

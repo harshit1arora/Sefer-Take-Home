@@ -1,0 +1,172 @@
+{
+  "invoice": {
+    "number": "HLAS/BP/26-0912",
+    "date": "2026-09-12",
+    "currency": "USD",
+    "incoterm": "CIF TACOMA, WA",
+    "freight": 3850,
+    "insurance": 185,
+    "statedTotal": 27270,
+    "seller": {
+      "name": "Harborline Apparel Sourcing Limited",
+      "address1": "Unit 100, 10/F, Example Industrial Building, 100 Example Street",
+      "city": "Hong Kong",
+      "country": "HK"
+    },
+    "buyer": {
+      "name": "Bluepeak Outfitters, Inc.",
+      "address1": "100 Example Street, Suite 300",
+      "city": "Portland",
+      "state": "OR",
+      "zip": "97210",
+      "country": "US"
+    },
+    "shipTo": {
+      "name": "Summit Fulfillment Partners LLC",
+      "address1": "200 Example Avenue South, Dock 4",
+      "city": "Kent",
+      "state": "WA",
+      "zip": "98032",
+      "country": "US"
+    },
+    "po": "BP-26-0918",
+    "portOfLoading": "CAT LAI, HO CHI MINH CITY, VN",
+    "portOfDischarge": "TACOMA, WA, U.S.A.",
+    "lines": [
+      {
+        "lineNo": 1,
+        "style": "BP-T101",
+        "description": "MEN'S CREW NECK SHORT SLEEVE T-SHIRT 100% COTTON KNIT",
+        "hts": "6109.10",
+        "quantity": 2400,
+        "unit": "PCS",
+        "unitPrice": 2.85,
+        "statedAmount": 6480.0,
+        "originCountry": "VN",
+        "isFreeOfCharge": false
+      },
+      {
+        "lineNo": 2,
+        "style": "BP-H205",
+        "description": "WOMEN'S PULLOVER HOODIE 60/40 COTTON/POLYESTER FLEECE KNIT",
+        "hts": "6110.20",
+        "quantity": 1200,
+        "unit": "PCS",
+        "unitPrice": 7.4,
+        "statedAmount": 8880.0,
+        "originCountry": "VN",
+        "isFreeOfCharge": false
+      },
+      {
+        "lineNo": 3,
+        "style": "BP-C330",
+        "description": "MEN'S SLIM FIT CHINO TROUSERS 98/2 COTTON/ELASTANE WOVEN",
+        "hts": "6203.42",
+        "quantity": 900,
+        "unit": "PCS",
+        "unitPrice": 6.95,
+        "statedAmount": 6255.0,
+        "originCountry": "VN",
+        "isFreeOfCharge": false
+      },
+      {
+        "lineNo": 4,
+        "style": "W-B220",
+        "description": "WOMEN'S LONG SLEEVE V-NECK BLOUSE 100% POLYESTER WOVEN (CMT)",
+        "hts": "6206.40",
+        "quantity": 600,
+        "unit": "PCS",
+        "unitPrice": 2.1,
+        "statedAmount": 1260.0,
+        "originCountry": "VN",
+        "isFreeOfCharge": false,
+        "assistValue": 4180
+      },
+      {
+        "lineNo": 5,
+        "style": "BP-P118S",
+        "description": "WOMEN'S SHORT SLEEVE POLO SHIRT 100% COTTON KNIT FOC SAMPLES",
+        "hts": "6106.10",
+        "quantity": 24,
+        "unit": "PCS",
+        "unitPrice": 1.0,
+        "statedAmount": 24.0,
+        "originCountry": "BD",
+        "isFreeOfCharge": true,
+        "customsValue": 24,
+        "manufacturer": {
+          "name": "Example Garments Dhaka Ltd.",
+          "address1": "Plot 41, Example Industrial Estate",
+          "city": "Gazipur",
+          "country": "BD"
+        }
+      }
+    ],
+    "statedFobTotal": 23235,
+    "statedSubtotalCarriedForward": 21975
+  },
+  "packing": {
+    "number": "EXG-PL-2609-117",
+    "cartons": 138,
+    "grossKg": 1888,
+    "netKg": 1734.5,
+    "cbm": 13.58,
+    "lines": [
+      {
+        "style": "BP-T101",
+        "pcs": 2400
+      },
+      {
+        "style": "BP-H205",
+        "pcs": 1176
+      },
+      {
+        "style": "BP-C330",
+        "pcs": 900
+      },
+      {
+        "style": "W-B220",
+        "pcs": 600
+      },
+      {
+        "style": "BP-P118S",
+        "pcs": 24
+      }
+    ]
+  },
+  "bol": {
+    "houseBill": "BMLVHCM26090001",
+    "masterBill": "OPLUSGN26090001",
+    "houseScac": "BMLV",
+    "masterScac": "OPLU",
+    "vessel": "PACIFIC ARGOS",
+    "voyage": "041E",
+    "portOfLoading": "CAT LAI, HCMC, VN",
+    "portOfDischarge": "TACOMA, WA, USA",
+    "onBoardDate": "2026-09-24",
+    "etaDate": "2026-10-14",
+    "goodsDescription": "WEARING APPAREL",
+    "containers": [
+      {
+        "number": "OPLU1041723",
+        "seal": "EXL7731482",
+        "size": "20 ft",
+        "printedNumber": "OPLU1041726",
+        "correctionNote": "The printed number is struck through and a handwritten OPLU1041723 is written beside it."
+      }
+    ],
+    "packages": 138,
+    "packageUnit": "CTN",
+    "grossKg": 1930
+  },
+  "factory": {
+    "name": "Mekong Garment JSC",
+    "address1": "Lot C7-C8, Road No. 9, Example Industrial Park",
+    "city": "Di An",
+    "country": "VN"
+  },
+  "_provenance": "Hand-transcribed by the assistant from the three PDFs. Invoice values are checked against the PDF text layer by scripts/trace-source.mjs; packing list and B/L are scans and were transcribed visually.",
+  "extractionNotes": [
+    "The B/L container number was corrected by hand; verify the final digits against the carrier's record."
+  ]
+}

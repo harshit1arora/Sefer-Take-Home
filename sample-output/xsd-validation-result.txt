@@ -1,0 +1,15 @@
+XML validation result (bundled SUBSET schema: schemas/entry.xsd + schemas/data_type.xsd)
+
+sample-output/entry-HLAS-BP-26-0912.xml                                    validates
+sample-output/entry-HLAS-BP-26-0912.EXAMPLE-all-suggestions-approved.xml   validates
+sample-output/entry-HLAS-BP-26-0912.LIVE-GEMINI.xml                        validates
+sample-output/entry-HLAS-BP-26-0912.LIVE-GEMINI-all-suggestions-approved.xml validates
+
+The two ".LIVE-GEMINI" files were generated from a REAL Gemini extraction of the three sample PDFs
+(see live-gemini-extraction.json and docs/FINAL-VERIFICATION.md).
+
+Schema used: the BUNDLED SUBSET. The complete official NetCHB/Strix schema could NOT be downloaded in
+this environment (strixsmart.com unreachable), so `npm run fetch-schemas` could not run and this is a
+PARTIAL structure check only (PGA, entity and bond types are not defined in the subset).
+
+A pass here does NOT mean the entry is correct, fileable, or accepted by NetCHB. Nothing is submitted.

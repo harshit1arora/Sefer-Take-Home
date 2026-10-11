@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entry xmlns="http://www.netchb.com/xml/entry">
+  <entry-no><system-generated/></entry-no>
+  <external-reference-number>BP-26-0918</external-reference-number>
+  <header>
+    <!-- importer-tax-id missing: broker input required -->
+    <importer-name>Bluepeak Outfitters, Inc.</importer-name>
+    <!-- processing-port is a 0000 SENTINEL: replace before upload -->
+    <processing-port>0000</processing-port>
+    <entry-port>3002</entry-port>
+    <entry-date>2026-10-09</entry-date>
+    <entry-type>01</entry-type>
+    <charges>4035</charges>
+    <gross-weight>1930</gross-weight>
+    <total-entry-value>22899</total-entry-value>
+    <description>WEARING APPAREL</description>
+    <state-destination>WA</state-destination>
+    <vessel-name>PACIFIC ARGOS</vessel-name>
+    <mode-transportation>11</mode-transportation>
+    <unlading-port>3002</unlading-port>
+    <arrival-date>2026-10-14</arrival-date>
+    <carrier-code>OPLU</carrier-code>
+    <customer-reference-no>BP-26-0918</customer-reference-no>
+    <voyage-no>041E</voyage-no>
+  </header>
+  <manifest>
+    <bill-of-lading>
+      <master-scac>OPLU</master-scac><master-bill>SGN26090001</master-bill>
+      <house-scac>BMLV</house-scac><house-bill>HCM26090001</house-bill>
+      <quantity>138</quantity><unit>CTN</unit>
+    </bill-of-lading>
+  </manifest>
+  <containers>
+    <container>
+      <container-number>OPLU1041723</container-number>
+      <container-size>20 ft</container-size>
+      <container-type>Dry</container-type>
+      <seal-numbers>EXL7731482</seal-numbers>
+    </container>
+  </containers>
+  <invoices>
+    <invoice>
+      <invoice-no>HLAS-BP-26-0912</invoice-no>
+      <line-items>
+    <line-item>
+      <export-date>2026-09-24</export-date>
+      <country-origin>VN</country-origin>
+      <manufacturer-id>VNMEKGAR9DIA</manufacturer-id>
+      <tariffs><tariff>
+        <tariff-no>610910</tariff-no>
+        <value>6480.00</value>
+      </tariff></tariffs>
+      <country-export>VN</country-export>
+      <lading-port>55224</lading-port>
+      <commercial-description>MEN'S CREW NECK SHORT SLEEVE T-SHIRT 100% COTTON KNIT</commercial-description>
+      <invoice-quantity>2400</invoice-quantity>
+      <po-number>BP-26-0918</po-number>
+    </line-item>
+    <line-item>
+      <export-date>2026-09-24</export-date>
+      <country-origin>VN</country-origin>
+      <manufacturer-id>VNMEKGAR9DIA</manufacturer-id>
+      <tariffs><tariff>
+        <tariff-no>611020</tariff-no>
+        <value>8880.00</value>
+      </tariff></tariffs>
+      <country-export>VN</country-export>
+      <lading-port>55224</lading-port>
+      <commercial-description>WOMEN'S PULLOVER HOODIE 60/40 COTTON/POLYESTER FLEECE KNIT</commercial-description>
+      <invoice-quantity>1200</invoice-quantity>
+      <po-number>BP-26-0918</po-number>
+    </line-item>
+    <line-item>
+      <export-date>2026-09-24</export-date>
+      <country-origin>VN</country-origin>
+      <manufacturer-id>VNMEKGAR9DIA</manufacturer-id>
+      <tariffs><tariff>
+        <tariff-no>620342</tariff-no>
+        <value>6255.00</value>
+      </tariff></tariffs>
+      <country-export>VN</country-export>
+      <lading-port>55224</lading-port>
+      <commercial-description>MEN'S SLIM FIT CHINO TROUSERS 98/2 COTTON/ELASTANE WOVEN</commercial-description>
+      <invoice-quantity>900</invoice-quantity>
+      <po-number>BP-26-0918</po-number>
+    </line-item>
+    <line-item>
+      <export-date>2026-09-24</export-date>
+      <country-origin>VN</country-origin>
+      <manufacturer-id>VNMEKGAR9DIA</manufacturer-id>
+      <tariffs><tariff>
+        <tariff-no>620640</tariff-no>
+        <value>1260.00</value>
+      </tariff></tariffs>
+      <country-export>VN</country-export>
+      <lading-port>55224</lading-port>
+      <commercial-description>WOMEN'S LONG SLEEVE V-NECK BLOUSE 100% POLYESTER WOVEN (CMT)</commercial-description>
+      <invoice-quantity>600</invoice-quantity>
+      <po-number>BP-26-0918</po-number>
+    </line-item>
+    <line-item>
+      <export-date>2026-09-24</export-date>
+      <country-origin>BD</country-origin>
+      <manufacturer-id>BDEXAGAR41GAZ</manufacturer-id>
+      <tariffs><tariff>
+        <tariff-no>610610</tariff-no>
+        <value>24.00</value>
+      </tariff></tariffs>
+      <country-export>VN</country-export>
+      <lading-port>55224</lading-port>
+      <commercial-description>WOMEN'S SHORT SLEEVE POLO SHIRT 100% COTTON KNIT FOC SAMPLES</commercial-description>
+      <invoice-quantity>24</invoice-quantity>
+      <po-number>BP-26-0918</po-number>
+    </line-item>
+      </line-items>
+    </invoice>
+  </invoices>
+</entry>

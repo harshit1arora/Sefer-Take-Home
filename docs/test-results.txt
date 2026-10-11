@@ -1,0 +1,49 @@
+TEST RESULTS — Gemini provider, final verification pass (2026-10-11)
+Environment: Debian container, Node v22.18.0, clean `npm run install:all` (325 frontend + 76 server packages).
+These are the ACTUAL counts from this environment. See docs/FINAL-VERIFICATION.md for commands and exit codes.
+
+=== 1. Backend tests — real runner: `node --experimental-strip-types --test "test/*.test.ts"` ===
+Run with SEFER_SAMPLE_PDFS pointing at the three real PDFs.
+# tests 68
+# pass 67
+# fail 0
+# skipped 1   (the opt-in live-Gemini test; needs SEFER_LIVE_GEMINI=1 + GEMINI_API_KEY + direct network)
+Test files: config.test.ts, gemini.test.ts, regression.test.ts, integrity.test.ts, security.test.ts,
+            pipeline.test.ts, integration.test.ts, e2e.test.ts.
+Highlights: the real-Express multipart test runs; the HTTP end-to-end test uploads the three real PDFs
+through the real pipeline and regenerates an approved entry; the invoice text-layer fixture test runs
+against the real invoice PDF; Gemini request-construction tests pin the endpoint, header auth, inline_data
+PDF parts and generationConfig; new tests cover container size/number normalisation (a bug found live).
+
+=== 2. Frontend tests — real runner: `npx vitest run` (vitest 4.1.11 + jsdom) ===
+Test Files  2 passed (2)
+     Tests  26 passed (26)
+(entry.test.ts: 25 contract/API tests; app-routing.test.tsx: 1 TanStack Router test.)
+
+=== 3. Type checks ===
+server: `tsc -p server/tsconfig.json`  -> 0 errors
+web:    `tsc --noEmit`                  -> 0 errors
+
+=== 4. Production build ===
+`npm run build` -> succeeds (Nitro output in .output/).
+
+=== 5. XML validation (bundled SUBSET schema, schemas/entry.xsd + data_type.xsd) ===
+sample-output/entry-HLAS-BP-26-0912.xml                                   VALID
+sample-output/entry-HLAS-BP-26-0912.EXAMPLE-all-suggestions-approved.xml  VALID
+sample-output/entry-HLAS-BP-26-0912.LIVE-GEMINI.xml                       VALID  (from the live extraction)
+sample-output/entry-HLAS-BP-26-0912.LIVE-GEMINI-all-suggestions-approved.xml VALID
+Full official schema: NOT AVAILABLE in this environment (npm run fetch-schemas could not reach
+strixsmart.com). The app labels a subset pass as partial and never claims official acceptance.
+
+=== 6. Live Gemini extraction (2026-10-11) ===
+Real `generateContent` call to gemini-3.8-flash with the three sample PDFs (key sent in the
+x-goog-api-key header): HTTP 200, finishReason STOP, parsed by the app's own Zod validation.
+Result: entered value 22,899 (27,439 with both suggestions approved); XML passed the subset schema.
+Evidence: sample-output/live-gemini-extraction.json, sample-output/live-gemini-response-summary.json,
+sample-output/entry-HLAS-BP-26-0912.LIVE-GEMINI.xml.
+
+=== 7. Source trace — `node scripts/trace-source.mjs <pdf folder>` ===
+Invoice (text layer): 5/5 lines and 5/5 printed totals match the real invoice PDF.
+Packing list and B/L are image-only scans: OCR was unavailable in this environment, so their values
+remain visual transcriptions (stated as such in docs/source-trace.md). The live Gemini run read them
+from the page images.

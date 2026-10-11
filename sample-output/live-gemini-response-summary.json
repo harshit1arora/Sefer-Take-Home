@@ -1,0 +1,49 @@
+{
+  "note": "Produced by a REAL Gemini extraction (gemini-3.8-flash) of the three sample PDFs on 2026-10-11, then run through the app's own Zod validation, reconciliation and XML generation.",
+  "model": "gemini-3.8-flash",
+  "finishReason": "STOP",
+  "usage": {
+    "promptTokenCount": 2900,
+    "candidatesTokenCount": 1587,
+    "totalTokenCount": 4487,
+    "promptTokensDetails": [
+      {
+        "modality": "IMAGE",
+        "tokenCount": 2128
+      },
+      {
+        "modality": "TEXT",
+        "tokenCount": 772
+      }
+    ],
+    "serviceTier": "standard"
+  },
+  "entered": 22899,
+  "enteredIfAllSuggestionsApproved": 27439,
+  "validation": {
+    "syntax": {
+      "status": "passed",
+      "confirmedByBackend": true
+    },
+    "xsd": {
+      "status": "passed",
+      "confirmedByBackend": true,
+      "schema": "subset",
+      "complete": false,
+      "message": "Checked against the BUNDLED SUBSET schema only (PGA, entity and bond types are not defined in it). Run `npm run fetch-schemas` to validate against the full official schema. A pass never means the customs data is correct or that NetCHB will accept the entry."
+    },
+    "netchb": {
+      "status": "unavailable",
+      "confirmedByBackend": false,
+      "message": "This application never submits to NetCHB or CBP. Acceptance is not checked and is not implied."
+    }
+  },
+  "readiness": {
+    "readyToFile": false,
+    "note": "NOT ready to file: schema validation (passed) only proves structure. 8 blocking missing input(s), 13 assumption(s) needing confirmation, 2 suggested value change(s) not yet approved, 2 document discrepancy error(s).",
+    "blockingMissing": 8,
+    "unconfirmedAssumptions": 13,
+    "pendingSuggestions": 2,
+    "documentErrors": 2
+  }
+}

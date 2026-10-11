@@ -1,0 +1,506 @@
+{
+  "note": "Default response for the hand-transcribed sample shipment (no broker input, no approvals).",
+  "validation": {
+    "syntax": {
+      "status": "passed",
+      "confirmedByBackend": true
+    },
+    "xsd": {
+      "status": "passed",
+      "confirmedByBackend": true,
+      "schema": "subset",
+      "complete": false,
+      "message": "Checked against the BUNDLED SUBSET schema only (PGA, entity and bond types are not defined in it). Run `npm run fetch-schemas` to validate against the full official schema. A pass never means the customs data is correct or that NetCHB will accept the entry."
+    },
+    "netchb": {
+      "status": "unavailable",
+      "confirmedByBackend": false,
+      "message": "This application never submits to NetCHB or CBP. Acceptance is not checked and is not implied."
+    }
+  },
+  "readiness": {
+    "readyToFile": false,
+    "note": "NOT ready to file: schema validation (passed) only proves structure. 8 blocking missing input(s), 14 assumption(s) needing confirmation, 2 suggested value change(s) not yet approved, 2 document discrepancy error(s).",
+    "blockingMissing": 8,
+    "unconfirmedAssumptions": 14,
+    "pendingSuggestions": 2,
+    "documentErrors": 2
+  },
+  "valuation": {
+    "lines": [
+      {
+        "lineNo": 1,
+        "style": "BP-T101",
+        "components": [
+          {
+            "id": "invoice-amount",
+            "label": "Invoice line amount as printed",
+            "amount": 6480,
+            "provenance": "source",
+            "included": true,
+            "basis": "Invoice line 1, Amount USD column, unchanged from the document."
+          },
+          {
+            "id": "recomputed-delta",
+            "label": "Proposed correction to quantity x unit price (2400 x 2.85 = 6840.00)",
+            "amount": 360,
+            "provenance": "suggested",
+            "included": false,
+            "basis": "Suggested only. Printed amount and quantity x price disagree; see the finding for the evidence. Which figure was actually paid or payable must be confirmed (for example against the payment record)."
+          }
+        ],
+        "value": 6480,
+        "valueIfAllSuggestionsAccepted": 6840
+      },
+      {
+        "lineNo": 2,
+        "style": "BP-H205",
+        "components": [
+          {
+            "id": "invoice-amount",
+            "label": "Invoice line amount as printed",
+            "amount": 8880,
+            "provenance": "source",
+            "included": true,
+            "basis": "Invoice line 2, Amount USD column, unchanged from the document."
+          }
+        ],
+        "value": 8880,
+        "valueIfAllSuggestionsAccepted": 8880
+      },
+      {
+        "lineNo": 3,
+        "style": "BP-C330",
+        "components": [
+          {
+            "id": "invoice-amount",
+            "label": "Invoice line amount as printed",
+            "amount": 6255,
+            "provenance": "source",
+            "included": true,
+            "basis": "Invoice line 3, Amount USD column, unchanged from the document."
+          }
+        ],
+        "value": 6255,
+        "valueIfAllSuggestionsAccepted": 6255
+      },
+      {
+        "lineNo": 4,
+        "style": "W-B220",
+        "components": [
+          {
+            "id": "invoice-amount",
+            "label": "Invoice line amount as printed",
+            "amount": 1260,
+            "provenance": "source",
+            "included": true,
+            "basis": "Invoice line 4, Amount USD column, unchanged from the document."
+          },
+          {
+            "id": "assist",
+            "label": "Buyer-supplied material (assist)",
+            "amount": 4180,
+            "provenance": "suggested",
+            "included": false,
+            "basis": "Suggested only. Invoice note states USD 4180.00 of free fabric. Free materials incorporated in the goods are generally assists (19 U.S.C. 1401a(h)(1)(A)); amount and any added costs need broker confirmation. Kept separate from the invoice amount."
+          }
+        ],
+        "value": 1260,
+        "valueIfAllSuggestionsAccepted": 5440
+      },
+      {
+        "lineNo": 5,
+        "style": "BP-P118S",
+        "components": [
+          {
+            "id": "foc-customs-value",
+            "label": "Customs value printed for free-of-charge samples",
+            "amount": 24,
+            "provenance": "source",
+            "included": true,
+            "basis": "Invoice line 5: \"value for customs purpose only\" (24 x 1). No commercial value; valuation and any 9811.00.60 treatment are broker decisions."
+          }
+        ],
+        "value": 24,
+        "valueIfAllSuggestionsAccepted": 24
+      }
+    ],
+    "excluded": [
+      {
+        "label": "International freight",
+        "amount": 3850,
+        "why": "CIF sale: international freight is not part of the entered value. Invoice lines are priced FOB (the invoice totals them as 'TOTAL FOB VALUE')."
+      },
+      {
+        "label": "Marine insurance",
+        "amount": 185,
+        "why": "CIF sale: international insurance is not part of the entered value."
+      }
+    ],
+    "entered": 22899,
+    "enteredIfAllSuggestionsAccepted": 27439,
+    "pending": 2,
+    "method": "Sum of source-printed amounts plus broker-approved components only. Freight and insurance excluded (CIF). Duty is not calculated."
+  },
+  "findings": [
+    {
+      "id": "f1",
+      "severity": "attention",
+      "title": "Invoice line amount differs from quantity × unit price",
+      "description": "Invoice line 1 (BP-T101): printed amount 6480.00 but 2400 x 2.85 = 6840.00 (difference 360.00). The printed amount is kept unchanged in the entered value; the difference is only a SUGGESTED correction until a broker approves it. Supporting evidence in the same invoice: the invoice's own FOB total (23235.00) equals the sum of quantity x price (23235.00) and not the sum of printed line amounts (22875.00). Alternative reading: a unit price of 2.7 would reproduce the printed amount, but the invoice's totals do not support that. Confirm against the payment record or ask the shipper.",
+      "action": "Review lines",
+      "target": "lines"
+    },
+    {
+      "id": "f2",
+      "severity": "review",
+      "title": "FOB total needs reconciliation",
+      "description": "Sum of printed line amounts (22875.00) differs from the invoice's printed FOB total (23235.00); the sum of quantity x price is 23235.00.",
+      "action": "Review lines",
+      "target": "lines"
+    },
+    {
+      "id": "f3",
+      "severity": "attention",
+      "title": "Quantity differs between invoice and packing list",
+      "description": "BP-H205: invoice 1200 vs packing list 1176 (difference 24).",
+      "action": "Review lines",
+      "target": "lines"
+    },
+    {
+      "id": "f4",
+      "severity": "review",
+      "title": "Possible explanation for the quantity difference",
+      "description": "The 24-piece difference equals the free-of-charge sample quantity (24). Possible explanation: the invoice counted samples in this style. This is a hypothesis; confirm with the shipper.",
+      "action": "Review lines",
+      "target": "lines"
+    },
+    {
+      "id": "f5",
+      "severity": "review",
+      "title": "Gross weight differs between documents",
+      "description": "Gross weight: packing list 1888 kg vs B/L 1930 kg (difference 42 kg). The B/L figure is used; confirm.",
+      "action": "Edit details",
+      "target": "summary"
+    },
+    {
+      "id": "f6",
+      "severity": "attention",
+      "title": "Container number was corrected by hand on the B/L",
+      "description": "The B/L printed container number OPLU1041726 (check digit INVALID) but it is corrected by hand to OPLU1041723 (check digit valid). The printed number is struck through and a handwritten OPLU1041723 is written beside it. The corrected number is used; confirm it with the carrier before filing."
+    },
+    {
+      "id": "f7",
+      "severity": "attention",
+      "title": "Mixed countries of origin",
+      "description": "Several countries of origin on one invoice (VN, BD). Each line carries its own origin and manufacturer; check the invoice's blanket origin declaration and the \"Made in\" carton marks.",
+      "action": "Review lines",
+      "target": "lines"
+    },
+    {
+      "id": "f8",
+      "severity": "review",
+      "title": "Buyer-supplied fabric may be an assist",
+      "description": "Line 4 (W-B220): buyer-supplied material worth 4180.00 is stated only in an invoice note, not in the invoice amount. It is kept separate and excluded from the entered value until a broker approves it (assists: 19 U.S.C. 1401a(h)(1)(A); amount and added costs need confirmation).",
+      "action": "Review valuation",
+      "target": "broker"
+    },
+    {
+      "id": "f9",
+      "severity": "review",
+      "title": "Free-of-charge samples need valuation review",
+      "description": "Line 5 (BP-P118S) is free of charge; entered at the stated customs value 24. Sample treatment (for example HTSUS 9811.00.60 when marked or valued at $1 or less) needs broker review.",
+      "action": "Review lines",
+      "target": "lines"
+    },
+    {
+      "id": "f10",
+      "severity": "review",
+      "title": "Invoice number changed for NetCHB",
+      "description": "Invoice number \"HLAS/BP/26-0912\" contains characters NetCHB does not accept (allowed: letters, digits, hyphen, max 17). Submitted as \"HLAS-BP-26-0912\"; keep a mapping.",
+      "action": "Edit details",
+      "target": "summary"
+    },
+    {
+      "id": "f11",
+      "severity": "review",
+      "title": "Extraction note",
+      "description": "Extraction note: The B/L container number was corrected by hand; verify the final digits against the carrier's record."
+    },
+    {
+      "id": "f12",
+      "severity": "review",
+      "title": "Total pieces differ between documents",
+      "description": "Total pieces: packing list 5100 vs invoice 5124.",
+      "action": "Review lines",
+      "target": "lines"
+    },
+    {
+      "id": "f13",
+      "severity": "missing",
+      "title": "Tariff classification remains incomplete",
+      "description": "5 lines have no approved 10-digit HTSUS number: BP-T101, BP-H205, BP-C330, W-B220, BP-P118S. The documents carry only 6-digit HS codes; nothing is inferred. A broker must supply the classifications.",
+      "action": "Edit line items",
+      "target": "lines"
+    },
+    {
+      "id": "f14",
+      "severity": "review",
+      "title": "Suggested value changes await broker approval",
+      "description": "2 suggested components are excluded from the entered value (22899.00 USD). Approving all would make it 27439.00 USD.",
+      "action": "Review valuation",
+      "target": "broker"
+    },
+    {
+      "id": "f15",
+      "severity": "missing",
+      "title": "Missing before filing: processing-port",
+      "description": "Depends on the filing broker's processing port. Sentinel 0000 is in the XML and must be replaced.",
+      "action": "Add broker details",
+      "target": "broker"
+    },
+    {
+      "id": "f16",
+      "severity": "missing",
+      "title": "Missing before filing: importer-tax-id",
+      "description": "Importer of record EIN/CBP number is not on any document (required unless entry type 86).",
+      "action": "Add broker details",
+      "target": "broker"
+    },
+    {
+      "id": "f17",
+      "severity": "missing",
+      "title": "Missing before filing: surety-code / bond",
+      "description": "No bond information on the documents.",
+      "action": "Add broker details",
+      "target": "broker"
+    },
+    {
+      "id": "f18",
+      "severity": "missing",
+      "title": "Not on the documents: location-of-goods (FIRMS)",
+      "description": "Needed for cargo release; not on the documents.",
+      "action": "Add broker details",
+      "target": "broker"
+    },
+    {
+      "id": "f19",
+      "severity": "missing",
+      "title": "Not on the documents: ultimate-consignee",
+      "description": "Importer (Bluepeak) vs 3PL ship-to (Cascade) is a broker decision; element omitted.",
+      "action": "Add broker details",
+      "target": "broker"
+    },
+    {
+      "id": "f20",
+      "severity": "missing",
+      "title": "Not on the documents: related-party (Y/N)",
+      "description": "Relationship between seller and buyer not stated.",
+      "action": "Add broker details",
+      "target": "broker"
+    }
+  ],
+  "missing": [
+    {
+      "field": "processing-port",
+      "why": "Depends on the filing broker's processing port. Sentinel 0000 is in the XML and must be replaced.",
+      "blocking": true
+    },
+    {
+      "field": "importer-tax-id",
+      "why": "Importer of record EIN/CBP number is not on any document (required unless entry type 86).",
+      "blocking": true
+    },
+    {
+      "field": "surety-code / bond",
+      "why": "No bond information on the documents.",
+      "blocking": true
+    },
+    {
+      "field": "location-of-goods (FIRMS)",
+      "why": "Needed for cargo release; not on the documents.",
+      "blocking": false
+    },
+    {
+      "field": "ultimate-consignee",
+      "why": "Importer (Bluepeak) vs 3PL ship-to (Cascade) is a broker decision; element omitted.",
+      "blocking": false
+    },
+    {
+      "field": "related-party (Y/N)",
+      "why": "Relationship between seller and buyer not stated.",
+      "blocking": false
+    },
+    {
+      "field": "HTSUS 10-digit for BP-T101",
+      "why": "Only \"6109.10\" is on the documents. The XSD accepts 5-10 digits, so a 6-digit value passes validation but is not a fileable classification.",
+      "blocking": true
+    },
+    {
+      "field": "HTSUS 10-digit for BP-H205",
+      "why": "Only \"6110.20\" is on the documents. The XSD accepts 5-10 digits, so a 6-digit value passes validation but is not a fileable classification.",
+      "blocking": true
+    },
+    {
+      "field": "HTSUS 10-digit for BP-C330",
+      "why": "Only \"6203.42\" is on the documents. The XSD accepts 5-10 digits, so a 6-digit value passes validation but is not a fileable classification.",
+      "blocking": true
+    },
+    {
+      "field": "HTSUS 10-digit for W-B220",
+      "why": "Only \"6206.40\" is on the documents. The XSD accepts 5-10 digits, so a 6-digit value passes validation but is not a fileable classification.",
+      "blocking": true
+    },
+    {
+      "field": "HTSUS 10-digit for BP-P118S",
+      "why": "Only \"6106.10\" is on the documents. The XSD accepts 5-10 digits, so a 6-digit value passes validation but is not a fileable classification.",
+      "blocking": true
+    }
+  ],
+  "assumptions": [
+    {
+      "field": "entry-port",
+      "value": "3002",
+      "status": "assumed",
+      "basis": "Assumed entry at port of discharge. CBP CSMS 15-000496 and FDA port list: Tacoma, WA = 3002. The B/L routes goods by truck/ramp to Kent, WA; confirm no in-bond movement."
+    },
+    {
+      "field": "unlading-port",
+      "value": "3002",
+      "status": "verified",
+      "basis": "CBP CSMS 15-000496 and FDA port list: Tacoma, WA = 3002"
+    },
+    {
+      "field": "entry-type",
+      "value": "01",
+      "status": "assumed",
+      "basis": "Formal consumption entry assumed because entered value is above the informal threshold; broker decides entry type."
+    },
+    {
+      "field": "mode-transportation",
+      "value": "11",
+      "status": "assumed",
+      "basis": "11 is accepted by modeTransportType; meaning 'vessel, containerized' recalled from CBP ABI code lists, not re-verified."
+    },
+    {
+      "field": "state-destination",
+      "value": "WA",
+      "status": "derived",
+      "basis": "State of the ship-to address on the invoice and B/L."
+    },
+    {
+      "field": "carrier-code",
+      "value": "OPLU",
+      "status": "derived",
+      "basis": "SCAC of the ocean carrier named on the B/L (Orient Pacific Lines)."
+    },
+    {
+      "field": "gross-weight",
+      "value": "1930",
+      "status": "derived",
+      "basis": "B/L declared weight used; packing list shows a lower figure (see findings)."
+    },
+    {
+      "field": "charges",
+      "value": "4035",
+      "status": "assumed",
+      "basis": "Freight + insurance as non-dutiable charges (CIF). Semantics of header 'charges' not confirmed in the XSD; verify."
+    },
+    {
+      "field": "entry-date",
+      "value": "2026-10-09",
+      "status": "assumed",
+      "basis": "Set to the generation date; the broker sets the real filing/entry date."
+    },
+    {
+      "field": "arrival-date",
+      "value": "2026-10-14",
+      "status": "assumed",
+      "basis": "Estimated arrival date from the invoice; update on arrival."
+    },
+    {
+      "field": "master-scac/master-bill",
+      "value": "OPLU/SGN26090001",
+      "status": "assumed",
+      "basis": "Bill numbers split as SCAC + number (ACE manifest convention, recalled not verified). data_type.xsd billNoType alone would also accept the unsplit string."
+    },
+    {
+      "field": "house-scac/house-bill",
+      "value": "BMLV/HCM26090001",
+      "status": "assumed",
+      "basis": "Same SCAC + number split; B/L shows SCAC BMLV."
+    },
+    {
+      "field": "invoice-no",
+      "value": "HLAS-BP-26-0912",
+      "status": "derived",
+      "basis": "\"HLAS/BP/26-0912\" violates invoiceNoType pattern [A-Za-z\\d\\-]{1,17}; slashes replaced with hyphens."
+    },
+    {
+      "field": "country-export",
+      "value": "VN",
+      "status": "assumed",
+      "basis": "Goods shipped from Vietnam; the Bangladesh samples were consolidated at Cat Lai, so Vietnam is assumed as country of export for all lines."
+    },
+    {
+      "field": "lading-port",
+      "value": "55224",
+      "status": "assumed",
+      "basis": "CBP ACE Appendix F lists 55224 = Ho Chi Minh City and 55225 = Tan Cang; Cat Lai is not named, so confirm which one applies"
+    },
+    {
+      "field": "value BP-T101: recomputed-delta",
+      "value": "360.00",
+      "status": "broker_confirm",
+      "basis": "NOT in the entered value. Proposed correction to quantity x unit price (2400 x 2.85 = 6840.00). Suggested only. Printed amount and quantity x price disagree; see the finding for the evidence. Which figure was actually paid or payable must be confirmed (for example against the payment record)."
+    },
+    {
+      "field": "value W-B220: assist",
+      "value": "4180.00",
+      "status": "broker_confirm",
+      "basis": "NOT in the entered value. Buyer-supplied material (assist). Suggested only. Invoice note states USD 4180.00 of free fabric. Free materials incorporated in the goods are generally assists (19 U.S.C. 1401a(h)(1)(A)); amount and any added costs need broker confirmation. Kept separate from the invoice amount."
+    },
+    {
+      "field": "value BP-P118S",
+      "value": "24.00",
+      "status": "broker_confirm",
+      "basis": "Included as printed. Invoice line 5: \"value for customs purpose only\" (24 x 1). No commercial value; valuation and any 9811.00.60 treatment are broker decisions."
+    },
+    {
+      "field": "manufacturer-id BP-T101",
+      "value": "VNMEKGAR9DIA",
+      "status": "derived",
+      "basis": "MID derived from name/address (street line has several numbers: 7, 8, 9, 2) per 19 CFR Part 102 Appendix. Broker must confirm against the manufacturer's legal name and address."
+    },
+    {
+      "field": "manufacturer-id BP-H205",
+      "value": "VNMEKGAR9DIA",
+      "status": "derived",
+      "basis": "MID derived from name/address (street line has several numbers: 7, 8, 9, 2) per 19 CFR Part 102 Appendix. Broker must confirm against the manufacturer's legal name and address."
+    },
+    {
+      "field": "manufacturer-id BP-C330",
+      "value": "VNMEKGAR9DIA",
+      "status": "derived",
+      "basis": "MID derived from name/address (street line has several numbers: 7, 8, 9, 2) per 19 CFR Part 102 Appendix. Broker must confirm against the manufacturer's legal name and address."
+    },
+    {
+      "field": "manufacturer-id W-B220",
+      "value": "VNMEKGAR9DIA",
+      "status": "derived",
+      "basis": "MID derived from name/address (street line has several numbers: 7, 8, 9, 2) per 19 CFR Part 102 Appendix. Broker must confirm against the manufacturer's legal name and address."
+    },
+    {
+      "field": "manufacturer-id BP-P118S",
+      "value": "BDEXAGAR41GAZ",
+      "status": "derived",
+      "basis": "MID derived from name/address per 19 CFR Part 102 Appendix. Broker must confirm against the manufacturer's legal name and address."
+    },
+    {
+      "field": "container-type",
+      "value": "Dry",
+      "status": "assumed",
+      "basis": "20' GP (general purpose) mapped to 'Dry'."
+    }
+  ]
+}

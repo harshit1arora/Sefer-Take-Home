@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SUBSET of NetCHB entry.xsd (targetNamespace http://www.netchb.com/xml/entry).
+     Element names, ordering rules (entry = sequence; header/invoice/lineItem/tariff = all), occurrence and
+     types are copied from the official file fetched 2026-10-09 from
+     https://strixsmart.com/api/schema-docs/entry/source/entry.xsd (a mirror whose text says "NetChb").
+     OMITTED: PGA types (FDA/EPA/APHIS/...), ACE parties (entityType), bondType, email notifications, etc.
+     The fetched copy was truncated before those types, so they could not be reproduced verbatim.
+     For full validation run `npm run fetch-schemas` (needs network); the app then uses schemas/official/. -->
+<xsd:schema targetNamespace="http://www.netchb.com/xml/entry" xmlns:entry="http://www.netchb.com/xml/entry"
+  xmlns:data="http://www.netchb.com/xml/data" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xsd:import namespace="http://www.netchb.com/xml/data" schemaLocation="data_type.xsd"/>
+  <xsd:element name="entry">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="entry-no">
+          <xsd:complexType><xsd:choice>
+            <xsd:element name="user-specified"><xsd:complexType><xsd:sequence>
+              <xsd:element name="filer-code" type="data:filerCodeType"/>
+              <xsd:element name="entry-no" type="data:entryNoType"/>
+              <xsd:element name="check-sum" minOccurs="0"><xsd:simpleType><xsd:restriction base="xsd:integer"><xsd:minInclusive value="0"/><xsd:maxInclusive value="9"/></xsd:restriction></xsd:simpleType></xsd:element>
+            </xsd:sequence></xsd:complexType></xsd:element>
+            <xsd:element name="system-generated"/>
+          </xsd:choice></xsd:complexType>
+        </xsd:element>
+        <xsd:element name="precalculated" minOccurs="0" maxOccurs="1"/>
+        <xsd:element name="transmit" minOccurs="0"/>
+        <xsd:element name="external-reference-number" minOccurs="0"><xsd:simpleType><xsd:restriction base="xsd:token"><xsd:maxLength value="100"/></xsd:restriction></xsd:simpleType></xsd:element>
+        <xsd:element name="header" type="entry:headerType"/>
+        <xsd:element name="manifest" type="entry:manifestType"/>
+        <xsd:element name="containers" minOccurs="0">
+          <xsd:complexType><xsd:sequence>
+            <xsd:element name="container-number" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="container" type="entry:containerType" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence></xsd:complexType>
+        </xsd:element>
+        <xsd:element name="invoices">
+          <xsd:complexType><xsd:sequence><xsd:element name="invoice" type="entry:invoiceType" minOccurs="0" maxOccurs="unbounded"/></xsd:sequence></xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+      <xsd:attribute name="schemaLocation" type="xsd:token" use="optional"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:complexType name="headerType"><xsd:all>
+    <xsd:element name="importer-tax-id" type="data:taxIdType" minOccurs="0"/>
+    <xsd:element name="importer-name" minOccurs="0"/>
+    <xsd:element name="ultimate-consignee" minOccurs="0"><xsd:complexType><xsd:all>
+      <xsd:element name="tax-id" type="data:taxIdType" minOccurs="0"/>
+      <xsd:element name="consignee-name" minOccurs="0"/>
+      <xsd:element name="multiple" minOccurs="0"/>
+    </xsd:all></xsd:complexType></xsd:element>
+    <xsd:element name="processing-port" type="data:portType"/>
+    <xsd:element name="entry-port" type="data:portType"/>
+    <xsd:element name="entry-date" type="xsd:date"/>
+    <xsd:element name="entry-type" type="data:entryType"/>
+    <xsd:element name="charges" type="xsd:long" minOccurs="0"/>
+    <xsd:element name="gross-weight" type="xsd:long" minOccurs="0"/>
+    <xsd:element name="total-entry-value" minOccurs="0"><xsd:simpleType><xsd:restriction base="xsd:long"><xsd:minInclusive value="1"/></xsd:restriction></xsd:simpleType></xsd:element>
+    <xsd:element name="description" minOccurs="0"><xsd:simpleType><xsd:restriction base="xsd:token"><xsd:maxLength value="70"/></xsd:restriction></xsd:simpleType></xsd:element>
+    <xsd:element name="surety-code" type="data:suretyCodeType" minOccurs="0"/>
+    <xsd:element name="state-destination" type="data:usStateType" minOccurs="0"/>
+    <xsd:element name="vessel-name" minOccurs="0"><xsd:simpleType><xsd:restriction base="xsd:token"><xsd:maxLength value="20"/></xsd:restriction></xsd:simpleType></xsd:element>
+    <xsd:element name="mode-transportation" type="data:modeTransportType" minOccurs="0"/>
+    <xsd:element name="unlading-port" type="data:portType" minOccurs="0"/>
+    <xsd:element name="arrival-date" type="xsd:date" minOccurs="0"/>
+    <xsd:element name="carrier-code" type="data:carrierCodeType" minOccurs="0"/>
+    <xsd:element name="customer-reference-no" minOccurs="0"><xsd:simpleType><xsd:restriction base="xsd:token"><xsd:maxLength value="50"/></xsd:restriction></xsd:simpleType></xsd:element>
+    <xsd:element name="voyage-no" minOccurs="0"><xsd:simpleType><xsd:restriction base="xsd:token"><xsd:maxLength value="5"/></xsd:restriction></xsd:simpleType></xsd:element>
+    <xsd:element name="location-of-goods" minOccurs="0"><xsd:simpleType><xsd:restriction base="xsd:token"><xsd:maxLength value="4"/></xsd:restriction></xsd:simpleType></xsd:element>
+  </xsd:all></xsd:complexType>
+
+  <xsd:complexType name="containerType"><xsd:all>
+    <xsd:element name="container-number" type="xsd:string" minOccurs="0"/>
+    <xsd:element name="container-size" minOccurs="0"><xsd:simpleType><xsd:restriction base="xsd:string">
+      <xsd:enumeration value="20 ft"/><xsd:enumeration value="20 ft HC"/><xsd:enumeration value="40 ft"/><xsd:enumeration value="40 ft HC"/>
+      <xsd:enumeration value="45 ft"/><xsd:enumeration value="45 ft HC"/><xsd:enumeration value="53 ft"/><xsd:enumeration value="53 ft HC"/>
+    </xsd:restriction></xsd:simpleType></xsd:element>
+    <xsd:element name="container-type" minOccurs="0"><xsd:simpleType><xsd:restriction base="xsd:string">
+      <xsd:enumeration value="Dry"/><xsd:enumeration value="Flat Rack"/><xsd:enumeration value="Headload"/><xsd:enumeration value="Open"/>
+      <xsd:enumeration value="Reefer"/><xsd:enumeration value="LCL"/><xsd:enumeration value="Tank"/>
+    </xsd:restriction></xsd:simpleType></xsd:element>
+    <xsd:element name="seal-numbers" type="xsd:string" minOccurs="0"/>
+  </xsd:all></xsd:complexType>
+
+  <xsd:complexType name="manifestType"><xsd:sequence>
+    <xsd:element name="inbond-date" type="xsd:date" minOccurs="0"/>
+    <xsd:element name="bill-of-lading" minOccurs="0" maxOccurs="unbounded"><xsd:complexType><xsd:all>
+      <xsd:element name="master-scac" minOccurs="0" type="data:carrierCodeType"/>
+      <xsd:element name="master-bill" minOccurs="0" type="data:billNoType"/>
+      <xsd:element name="house-scac" minOccurs="0" type="data:carrierCodeType"/>
+      <xsd:element name="house-bill" minOccurs="0" type="data:billNoType"/>
+      <xsd:element name="quantity"><xsd:simpleType><xsd:restriction base="xsd:integer"><xsd:minInclusive value="0"/></xsd:restriction></xsd:simpleType></xsd:element>
+      <xsd:element name="unit"><xsd:simpleType><xsd:restriction base="xsd:token"><xsd:maxLength value="5"/></xsd:restriction></xsd:simpleType></xsd:element>
+    </xsd:all></xsd:complexType></xsd:element>
+  </xsd:sequence></xsd:complexType>
+
+  <xsd:complexType name="invoiceType"><xsd:all>
+    <xsd:element name="invoice-no" type="data:invoiceNoType"/>
+    <xsd:element name="related-party" minOccurs="0"/>
+    <xsd:element name="foreign-currency" minOccurs="0"><xsd:complexType><xsd:all>
+      <xsd:element name="currency-code"><xsd:simpleType><xsd:restriction base="xsd:token"><xsd:pattern value="[A-Z]{3}"/></xsd:restriction></xsd:simpleType></xsd:element>
+      <xsd:element name="exchange-rate" minOccurs="0"><xsd:simpleType><xsd:restriction base="xsd:float"><xsd:minExclusive value="0"/></xsd:restriction></xsd:simpleType></xsd:element>
+      <xsd:element name="currency-country-code" minOccurs="0"><xsd:simpleType><xsd:restriction base="xsd:token"><xsd:pattern value="[A-Z]{2}"/></xsd:restriction></xsd:simpleType></xsd:element>
+    </xsd:all></xsd:complexType></xsd:element>
+    <xsd:element name="line-items"><xsd:complexType><xsd:sequence>
+      <xsd:element name="line-item" type="entry:lineItemType" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence></xsd:complexType></xsd:element>
+  </xsd:all></xsd:complexType>
+
+  <xsd:complexType name="lineItemType"><xsd:all>
+    <xsd:element name="export-date" type="xsd:date" minOccurs="0"/>
+    <xsd:element name="country-origin" type="data:countryCodeType"/>
+    <xsd:element name="manufacturer-id" type="data:manufacturerIdType" minOccurs="0"/>
+    <xsd:element name="related-party" minOccurs="0"><xsd:simpleType><xsd:restriction base="xsd:token"><xsd:enumeration value="Y"/><xsd:enumeration value="N"/></xsd:restriction></xsd:simpleType></xsd:element>
+    <xsd:element name="tariffs"><xsd:complexType><xsd:sequence>
+      <xsd:element name="tariff" minOccurs="1" maxOccurs="unbounded" type="entry:tariffType"/>
+    </xsd:sequence></xsd:complexType></xsd:element>
+    <xsd:element name="country-export" type="data:countryCodeType" minOccurs="0"/>
+    <xsd:element name="lading-port" minOccurs="0"><xsd:simpleType><xsd:restriction base="data:foreignPortType"/></xsd:simpleType></xsd:element>
+    <xsd:element name="gross-weight" minOccurs="0"><xsd:simpleType><xsd:restriction base="xsd:long"><xsd:minInclusive value="0"/></xsd:restriction></xsd:simpleType></xsd:element>
+    <xsd:element name="commercial-description" minOccurs="0" type="xsd:string"/>
+    <xsd:element name="invoice-quantity" minOccurs="0" type="xsd:double"/>
+    <xsd:element name="po-number" type="xsd:string" minOccurs="0"/>
+  </xsd:all></xsd:complexType>
+
+  <xsd:complexType name="tariffType"><xsd:all>
+    <xsd:element name="tariff-no" type="data:tariffNoType"/>
+    <xsd:element name="value"><xsd:simpleType><xsd:restriction base="data:dollarAmountType"><xsd:maxExclusive value="10000000000"/></xsd:restriction></xsd:simpleType></xsd:element>
+    <xsd:element name="duty" minOccurs="0"><xsd:simpleType><xsd:restriction base="data:dollarAmountType"><xsd:maxExclusive value="100000000"/></xsd:restriction></xsd:simpleType></xsd:element>
+    <xsd:element name="quantity1" minOccurs="0" type="xsd:double"/>
+    <xsd:element name="unit-of-measure1" type="data:unitOfMeasureType" minOccurs="0"/>
+    <xsd:element name="special-program" minOccurs="0" type="data:specialProgramType"/>
+  </xsd:all></xsd:complexType>
+</xsd:schema>

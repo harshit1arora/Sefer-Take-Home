@@ -1,0 +1,49 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+.output
+.vinxi
+.tanstack/**
+.nitro
+*.local
+
+# Wrangler / Cloudflare
+.wrangler/
+.dev.vars
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# --- Sefer entry workspace additions ---
+# Secrets
+.env
+.env.*
+!.env.example
+# Uploaded / sample shipping documents must never be committed (they contain customs and commercial data)
+uploads/
+tmp/
+*.pdf
+# Downloaded third-party schema files (re-create with `npm run fetch-schemas`)
+schemas/official/
+# Backend
+server/node_modules
+server/.env
+# Local test output
+coverage/
