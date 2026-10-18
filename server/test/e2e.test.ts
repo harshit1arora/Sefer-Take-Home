@@ -50,6 +50,7 @@ test("e2e (HTTP): upload the three real PDFs -> entry response -> approve -> reg
     // approve both suggestions and regenerate, exactly as the workspace does
     const approved = {
       source: entry.source,
+      sourceProof: entry.sourceProof,
       shipment: entry.shipment,
       broker: { approvals: { acceptRecomputedAmounts: "all", acceptAssist: "all" } },
     };

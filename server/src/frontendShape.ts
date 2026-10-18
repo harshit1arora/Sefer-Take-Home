@@ -1,4 +1,5 @@
 import type { InvoiceLine, Shipment } from "./core/types.ts";
+import { ensureLineIds } from "./core/lineIds.ts";
 
 /** Shape of `shipment` in the frontend's EntryResponse (src/features/entry/models.ts). */
 export interface FrontendLine {
@@ -13,9 +14,12 @@ export interface FrontendShipment {
 
 const COUNTRY_NAMES: Record<string, string> = {
   VN: "Vietnam", BD: "Bangladesh", CN: "China", IN: "India", ID: "Indonesia", KH: "Cambodia", TH: "Thailand", HK: "Hong Kong",
+  JP: "Japan", DE: "Germany", IT: "Italy", MY: "Malaysia", KR: "South Korea", LK: "Sri Lanka", GB: "United Kingdom",
+  PH: "Philippines", ES: "Spain", FR: "France", NL: "Netherlands", BE: "Belgium", SG: "Singapore", AU: "Australia",
+  CA: "Canada", BR: "Brazil", PE: "Peru", AE: "United Arab Emirates", SA: "Saudi Arabia", EG: "Egypt", ZA: "South Africa",
   TW: "Taiwan", PK: "Pakistan", TR: "Turkey", MX: "Mexico", US: "United States",
 };
-export const countryName = (c: string) => COUNTRY_NAMES[c.toUpperCase()] ?? c.toUpperCase();
+export const countryName = (c: string | undefined) => (c ? (COUNTRY_NAMES[c.toUpperCase()] ?? c.toUpperCase()) : "");
 
 const title = (s: string) => s.toLowerCase().replace(/\b\p{L}/gu, (m) => m.toUpperCase());
 /** "TACOMA, WA, U.S.A." -> "Tacoma, WA" */
@@ -26,12 +30,13 @@ export function formatPlace(raw: string | undefined): string {
   return state ? `${title(parts[0] ?? "")}, ${state}` : parts.map(title).slice(0, 2).join(", ");
 }
 
-export const lineId = (l: Pick<InvoiceLine, "lineNo">) => `line-${l.lineNo}`;
+export const lineId = (l: Pick<InvoiceLine, "lineNo"> & { id?: string }) => l.id ?? `line-${l.lineNo}`;
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
-export function toFrontendShipment(s: Shipment, htsByStyle: Record<string, string> = {}): FrontendShipment {
+export function toFrontendShipment(input: Shipment, htsByStyle: Record<string, string> = {}): FrontendShipment {
+  const s = ensureLineIds(input); // ids must exist here so the client round-trips exactly the ids the backend assigned
   const inv = s.invoice, paid = inv.lines.filter((l) => !l.isFreeOfCharge);
-  const origins = [...new Set(inv.lines.map((l) => countryName(l.originCountry)))];
+  const origins = [...new Set(inv.lines.map((l) => countryName(l.originCountry)).filter(Boolean))];
   const out: FrontendShipment = {
     id: `shipment-${inv.number.replace(/[^A-Za-z0-9]+/g, "-")}`,
     invoiceNumber: inv.number,
@@ -48,7 +53,7 @@ export function toFrontendShipment(s: Shipment, htsByStyle: Record<string, strin
     commercialQuantity: paid.reduce((n, l) => n + l.quantity, 0),
     isDemo: false,
     lines: inv.lines.map((l) => ({
-      id: lineId(l), style: l.style, description: l.description, hsCode: htsByStyle[l.style] ?? l.hts ?? "",
+      id: lineId(l), style: l.style, description: l.description, hsCode: htsByStyle[lineId(l)] ?? l.hts ?? "",
       quantity: l.quantity, unit: l.unit, unitPrice: l.unitPrice, amount: l.amountOverride ?? l.statedAmount,
       origin: countryName(l.originCountry), freeOfCharge: l.isFreeOfCharge,
     })),

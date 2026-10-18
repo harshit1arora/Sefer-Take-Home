@@ -148,8 +148,10 @@ sample-output/        XML and response generated for the sample shipment
 
 See `docs/FINAL-VERIFICATION.md` (the authoritative record: commands, exit codes, counts) and `docs/test-results.txt`. Summary:
 
-* **Verified on this Gemini-enabled source tree (2026-10-11):** clean `npm run install:all`; **67 backend tests** (0 fail, 1 opt-in live test skipped) and **26 frontend tests** under real `vitest` + `jsdom`; `tsc` for frontend and server (0 errors); `npm run build`; all sample XML against the bundled subset schema; the invoice source trace; and a **live Gemini extraction** of the three real PDFs (`gemini-3.8-flash`, HTTP 200) that produced the correct entered value (22,899 / 27,439) and a schema-valid XML. See `docs/FINAL-VERIFICATION.md`.
-* **Not verified:** validation against the full official schema (`npm run fetch-schemas` could not reach the schema host), and the workflow through a real browser (exercised at the HTTP layer and through the live Gemini API instead).
+* **Latest verification run — 2026-10-18** (Node 22.18, clean `npm run install:all`): **94 backend tests** (93 passed, 0 failed, 1 opt-in live test skipped) and **27 frontend tests** under real `vitest` + `jsdom`; `tsc` for frontend and server (0 errors); `npm run build`; and all four sample XML files VALID against the **bundled subset** schema. These are the current numbers.
+* **Historical (superseded) results.** Earlier dated runs recorded smaller totals as the suite grew (backend 67 -> 75 -> 81 -> 90 -> 93, frontend 26). They are kept in `docs/FINAL-VERIFICATION.md` as history only; the 2026-10-18 run above supersedes them.
+* **Live Gemini extraction** was performed once, on **2026-10-11** (real `generateContent` call, HTTP 200, `gemini-3.8-flash`); it was **not** re-run in the latest pass. Evidence in `sample-output/*LIVE-GEMINI*`.
+* **Not verified (still open):** validation against the **full official NetCHB/Strix schema** (`npm run fetch-schemas` cannot reach the schema host, so only the bundled subset is used), and the workflow through a **real browser** (exercised at the HTTP layer and through the live Gemini API instead).
 
 If any of these fail on your machine, the output of `npm run check` and the browser error message are the starting point.
 

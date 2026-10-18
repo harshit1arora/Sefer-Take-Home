@@ -49,11 +49,11 @@ test("without the invoice's own totals the finding says no other figure resolves
 
 // ---------- 2. approvals ----------
 test("approving the recomputed amount for one style changes only that style, with provenance", async () => {
-  const r = await processShipment(sample(), { approvals: { acceptRecomputedAmounts: ["BP-T101"] } }, T);
+  const r = await processShipment(sample(), { approvals: { acceptRecomputedAmounts: ["L1"] } }, T);
   assert.deepEqual(r.totals.byLine.map((x) => x.value), [6840, 8880, 6255, 1260, 24]);
   assert.equal(r.totals.entered, 23259);
   assert.equal(r.valuation.lines[0].components[1].provenance, "broker_approved");
-  assert.ok(r.assumptions.some((a) => a.field === "value BP-T101: recomputed-delta" && a.status === "broker_approved"));
+  assert.ok(r.assumptions.some((a) => a.field === "value L1: recomputed-delta" && a.status === "broker_approved"));
 });
 
 // ---------- 3. assist ----------
@@ -64,8 +64,8 @@ test("assist stays separate from the invoice amount and is excluded until approv
   assert.deepEqual(blouse.components[1], { ...blouse.components[1], id: "assist", amount: 4180, provenance: "suggested", included: false });
   assert.equal(blouse.value, 1260);
   assert.equal(valueOf(r.xml, 3), "1260.00");
-  assert.ok(r.assumptions.some((a) => a.field === "value W-B220: assist" && a.status === "broker_confirm" && /NOT in the entered value/.test(a.basis)));
-  const a = await processShipment(sample(), { approvals: { acceptAssist: ["W-B220"] } }, T);
+  assert.ok(r.assumptions.some((a) => a.field === "value L4: assist" && a.status === "broker_confirm" && /NOT in the entered value/.test(a.basis)));
+  const a = await processShipment(sample(), { approvals: { acceptAssist: ["L4"] } }, T);
   assert.equal(a.valuation.lines[3].value, 5440);
   assert.equal(valueOf(a.xml, 3), "5440.00");
   assert.equal(a.shipment.invoice.lines[3].statedAmount, 1260, "invoice amount untouched by assist approval");
@@ -107,7 +107,7 @@ test("missing broker inputs are listed, blocking, and visible in the XML", async
 });
 
 test("even with every broker input and approval, ready stays false while assumptions remain", async () => {
-  const hts = { "BP-T101": "6109100012", "BP-H205": "6110203079", "BP-C330": "6203424011", "W-B220": "6206400030", "BP-P118S": "6106100010" };
+  const hts = { "L1": "6109100012", "L2": "6110203079", "L3": "6203424011", "L4": "6206400030", "L5": "6106100010" };
   const r = await processShipment(sample(), { importerTaxId: "12-3456789", processingPort: "3001", suretyCode: "999", entryType: "01", entryPort: "3002",
     locationOfGoods: "T123", htsByStyle: hts, approvals: { acceptRecomputedAmounts: "all", acceptAssist: "all" } }, T);
   assert.equal(r.validation.valid, true, r.validation.errors.join("\n"));
@@ -190,7 +190,78 @@ test("validation result states whether the full schema was used", async () => {
   assert.match(r.validation.note, /never means|does not mean/);
 });
 
-// ---------- 9. fixture vs real PDFs ----------
+// ---------- 9. invoice totals with absent freight/insurance & unit compatibility ----------
+test("invoice statedTotal validation with neither component, freight only, insurance only, both, and mismatch", () => {
+  // 1. Neither freight nor insurance present: statedTotal = statedFobTotal
+  const s1 = sample();
+  delete s1.invoice.freight;
+  delete s1.invoice.insurance;
+  s1.invoice.statedTotal = s1.invoice.statedFobTotal;
+  const okNeither = reconcile(s1).find((x) => x.code === "INVOICE_TOTAL_OK");
+  assert.ok(okNeither, "should find INVOICE_TOTAL_OK when neither freight nor insurance is present");
+
+  // 2. Freight only: statedTotal = statedFobTotal + freight
+  const s2 = sample();
+  s2.invoice.freight = 1500;
+  delete s2.invoice.insurance;
+  s2.invoice.statedTotal = (s2.invoice.statedFobTotal ?? 0) + 1500;
+  const okFreight = reconcile(s2).find((x) => x.code === "INVOICE_TOTAL_OK");
+  assert.ok(okFreight, "should find INVOICE_TOTAL_OK when freight only is present");
+
+  // 3. Insurance only: statedTotal = statedFobTotal + insurance
+  const s3 = sample();
+  delete s3.invoice.freight;
+  s3.invoice.insurance = 250;
+  s3.invoice.statedTotal = (s3.invoice.statedFobTotal ?? 0) + 250;
+  const okInsurance = reconcile(s3).find((x) => x.code === "INVOICE_TOTAL_OK");
+  assert.ok(okInsurance, "should find INVOICE_TOTAL_OK when insurance only is present");
+
+  // 4. Both components present: statedTotal = statedFobTotal + freight + insurance
+  const s4 = sample();
+  s4.invoice.freight = 3850;
+  s4.invoice.insurance = 185;
+  s4.invoice.statedTotal = (s4.invoice.statedFobTotal ?? 0) + 3850 + 185;
+  const okBoth = reconcile(s4).find((x) => x.code === "INVOICE_TOTAL_OK");
+  assert.ok(okBoth, "should find INVOICE_TOTAL_OK when both freight and insurance are present");
+
+  // 5. Mismatched total: statedTotal differs from components
+  const s5 = sample();
+  s5.invoice.freight = 3850;
+  s5.invoice.insurance = 185;
+  s5.invoice.statedTotal = (s5.invoice.statedFobTotal ?? 0) + 3850 + 185 + 99.99;
+  const warnMismatch = reconcile(s5).find((x) => x.code === "INVOICE_TOTAL");
+  assert.ok(warnMismatch, "should flag INVOICE_TOTAL mismatch when statedTotal differs");
+  assert.match(warnMismatch.message, /invoice states grand total/);
+});
+
+test("unit compatibility flags incompatible quantity and package units as blocking findings", async () => {
+  // UNIT_INCOMPATIBLE test
+  const sQty = sample();
+  sQty.invoice.lines[0].unit = "DOZ"; // dozen vs pcs on packing list
+  const recQty = reconcile(sQty);
+  const findUnit = recQty.find((x) => x.code === "UNIT_INCOMPATIBLE");
+  assert.ok(findUnit, "should flag UNIT_INCOMPATIBLE when units are incompatible");
+  
+  // PKG_UNIT_INCOMPATIBLE test
+  const sPkg = sample();
+  sPkg.bol.packageUnit = "PALLETS"; // pallets vs cartons on packing list
+  const recPkg = reconcile(sPkg);
+  const findPkg = recPkg.find((x) => x.code === "PKG_UNIT_INCOMPATIBLE");
+  assert.ok(findPkg, "should flag PKG_UNIT_INCOMPATIBLE when package units are incompatible");
+
+  // Verify they block readiness
+  const rQty = await processShipment(sQty, {}, T);
+  assert.equal(rQty.readyToFile, false, "UNIT_INCOMPATIBLE must block readyToFile");
+  assert.ok(rQty.findings.some((f) => f.code === "UNIT_INCOMPATIBLE"));
+  assert.match(rQty.readinessNote, /blocking document discrepancy/i);
+
+  const rPkg = await processShipment(sPkg, {}, T);
+  assert.equal(rPkg.readyToFile, false, "PKG_UNIT_INCOMPATIBLE must block readyToFile");
+  assert.ok(rPkg.findings.some((f) => f.code === "PKG_UNIT_INCOMPATIBLE"));
+  assert.match(rPkg.readinessNote, /blocking document discrepancy/i);
+});
+
+// ---------- 10. fixture vs real PDFs ----------
 const uploads = process.env["SEFER_SAMPLE_PDFS"] ?? "";
 test("fixture invoice values match the invoice PDF text layer (skipped if PDFs absent)", { skip: !uploads || !existsSync(uploads) || !readdirSync(uploads).some((f: string) => /Commercial_Invoice/.test(f)) }, () => {
   execFileSync("node", [resolve(root, "scripts/trace-source.mjs"), uploads], { stdio: "pipe" });

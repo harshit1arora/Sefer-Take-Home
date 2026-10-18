@@ -1,7 +1,10 @@
 import type { Assumption, BrokerInputs, Finding, MissingItem, Shipment, ValidationResult, Valuation } from "./core/types.ts";
 import { processShipment } from "./core/pipeline.ts";
+import { assessReadiness } from "./core/readiness.ts";
+import { ensureLineIds } from "./core/lineIds.ts";
 import { applyEdits, type EditRecord, type EditResult } from "./edits.ts";
 import { toFrontendShipment, type FrontendShipment } from "./frontendShape.ts";
+import { signSource } from "./core/sourceProof.ts";
 
 /** Matches `findingSchema` in src/features/entry/models.ts. */
 export interface FrontendFinding {
@@ -15,6 +18,8 @@ export interface EntryResponseBody {
   validation: { syntax: FrontendCheck; xsd: FrontendCheck; netchb: FrontendCheck };
   // additive fields (optional in the frontend schema)
   source: Shipment;
+  /** HMAC over `source`: proves it was produced by this server's extraction. Required by /regenerate. */
+  sourceProof: string;
   valuation: Valuation;
   assumptions: Assumption[];
   missing: MissingItem[];
@@ -40,6 +45,21 @@ const SPECS: Record<string, Spec | null> = {
   FOC: { severity: "review", title: "Free-of-charge samples need valuation review", ...LINES },
   ASSIST: { severity: "review", title: "Buyer-supplied fabric may be an assist", target: "broker", action: "Review valuation" },
   INVOICE_NO_CHARS: { severity: "review", title: "Invoice number changed for NetCHB", target: "summary", action: "Edit details" },
+  INVOICE_NO_TRUNCATED: { severity: "attention", title: "Invoice number truncated for NetCHB", target: "summary", action: "Edit details" },
+  DUPLICATE_STYLE: { severity: "review", title: "Style code repeats on the invoice", ...LINES },
+  ZERO_QUANTITY: { severity: "attention", title: "Line has a non-positive quantity", ...LINES },
+  INVOICE_NO_EMPTY: { severity: "attention", title: "Invoice number has no usable characters", target: "summary", action: "Edit details" },
+  DUPLICATE_LINE_NO: { severity: "attention", title: "Duplicate invoice line number", ...LINES },
+  ORIGIN_MISSING: { severity: "attention", title: "Country of origin not stated", ...LINES },
+  PL_STYLE_NOT_INVOICED: { severity: "review", title: "Packing-list style has no invoice line", ...LINES },
+  NET_GT_GROSS: { severity: "attention", title: "Net weight exceeds gross weight", target: "summary", action: "Edit details" },
+  ETA_BEFORE_ONBOARD: { severity: "attention", title: "ETA precedes the on-board date", target: "summary", action: "Edit details" },
+  DUPLICATE_CONTAINER: { severity: "attention", title: "Duplicate container number" },
+  PACKAGES_ZERO: { severity: "attention", title: "Package count is zero", target: "summary", action: "Edit details" },
+  GROSS_ZERO: { severity: "attention", title: "Gross weight is zero", target: "summary", action: "Edit details" },
+  CONTROL_CHARS: { severity: "review", title: "Control characters removed from the XML", ...LINES },
+  UNIT_INCOMPATIBLE: { severity: "review", title: "Incompatible quantity units between invoice and packing list", ...LINES },
+  PKG_UNIT_INCOMPATIBLE: { severity: "review", title: "Incompatible package units between B/L and packing list", target: "summary", action: "Edit details" },
   EXTRACTION_NOTE: { severity: "review", title: "Extraction note" },
   TOTAL_PCS: { severity: "review", title: "Total pieces differ between documents", ...LINES },
   // purely informational confirmations: shown in the valuation panel, not as open items
@@ -93,23 +113,23 @@ export async function buildEntryResponse(
   source: Shipment,
   opts: { edited?: FrontendShipment; broker?: BrokerInputs; today?: string } = {},
 ): Promise<EntryResponseBody> {
-  const edit = opts.edited ? applyEdits(source, opts.edited) : undefined;
-  const working = edit?.working ?? source;
+  const src = ensureLineIds(source);
+  const edit = opts.edited ? applyEdits(src, opts.edited) : undefined;
+  const working = edit?.working ?? src;
   const broker: BrokerInputs = { ...opts.broker, htsByStyle: { ...opts.broker?.htsByStyle, ...edit?.htsByStyle } };
   const r = await processShipment(working, broker, opts.today);
-  const blockingMissing = r.missing.filter((m) => m.blocking).length;
-  const unconfirmed = r.assumptions.filter((a) => a.status === "broker_confirm" || a.status === "assumed").length;
-  const errors = r.findings.filter((f) => f.severity === "error" && f.code !== "HTS10_MISSING").length;
+  const readiness = assessReadiness({ validation: r.validation, missing: r.missing, assumptions: r.assumptions, valuation: r.valuation, findings: r.findings });
   return {
     shipment: toFrontendShipment(working, broker.htsByStyle),
     findings: mapFindings(r.findings, r.missing, r.valuation, edit),
     xml: r.xml,
     validation: mapValidation(r.validation),
-    source,
+    source: src,
+    sourceProof: signSource(src),
     valuation: r.valuation,
     assumptions: r.assumptions,
     missing: r.missing,
     edits: edit?.edits ?? [],
-    readiness: { readyToFile: r.readyToFile, note: r.readinessNote, blockingMissing, unconfirmedAssumptions: unconfirmed, pendingSuggestions: r.valuation.pending, documentErrors: errors },
+    readiness: { readyToFile: r.readyToFile, note: r.readinessNote, blockingMissing: readiness.blockingMissing, unconfirmedAssumptions: readiness.unconfirmedAssumptions, pendingSuggestions: readiness.pendingSuggestions, documentErrors: readiness.blockingFindings },
   };
 }

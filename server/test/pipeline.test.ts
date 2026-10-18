@@ -86,7 +86,7 @@ test("date disambiguation uses the B/L date", () => {
 test("normalisation helpers", () => {
   assert.equal(sanitizeInvoiceNo("HLAS/BP/26-0912").value, "HLAS-BP-26-0912");
   assert.equal(sanitizeInvoiceNo("INV 2026 / 000000000000001").value.length <= 17, true);
-  assert.deepEqual(splitBill("OPLU", "OPLUSGN26090001"), { scac: "OPLU", number: "SGN26090001" });
+  assert.deepEqual(splitBill("OPLU", "OPLUSGN26090001"), { scac: "OPLU", number: "SGN26090001", split: true });
   assert.equal(usPort("TACOMA, WA, U.S.A.")?.code, "3002");
 });
 
@@ -110,7 +110,7 @@ test("variant: missing container + broker-supplied inputs flow through and valid
   const s = sample(); s.bol.containers = [];
   assert.ok(codes(s).includes("NO_CONTAINER"));
   const broker = { processingPort: "3001", importerTaxId: "12-3456789", suretyCode: "999", filerCode: "ABC",
-    htsByStyle: { "BP-T101": "6109100012" } };
+    htsByStyle: { "L1": "6109100012" } };
   const r = await processShipment(s, broker, TODAY);
   assert.match(r.xml, /<importer-tax-id>12-3456789<\/importer-tax-id>/);
   assert.match(r.xml, /<tariff-no>6109100012<\/tariff-no>/);

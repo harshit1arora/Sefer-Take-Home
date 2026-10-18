@@ -3,6 +3,7 @@ import { toIso2 } from "./core/normalize.ts";
 import { toFrontendShipment, type FrontendShipment } from "./frontendShape.ts";
 
 export interface EditRecord { scope: "summary" | "line"; target: string; field: string; original: string; edited: string }
+/** `htsByStyle` maps a line's STABLE id (not its style code) to a broker-approved 10-digit HTSUS. */
 export interface EditResult { working: Shipment; htsByStyle: Record<string, string>; edits: EditRecord[]; ignored: string[] }
 
 const same = (a: number, b: number) => Math.abs(a - b) < 1e-9;
@@ -49,7 +50,7 @@ export function applyEdits(source: Shipment, edited: FrontendShipment): EditResu
   const baseById = new Map(base.lines.map((l) => [l.id, l]));
   const keep: InvoiceLine[] = [];
   for (const line of working.invoice.lines) {
-    const id = `line-${line.lineNo}`, b = baseById.get(id)!, e = editedById.get(id);
+    const id = line.id ?? `line-${line.lineNo}`, b = baseById.get(id)!, e = editedById.get(id);
     if (!e) { rec("line", b.style ?? id, "line", "present on the documents", "removed by broker"); continue; }
     const tgt = b.style ?? id;
     if ((e.style ?? "") !== (b.style ?? "")) { if ((e.style ?? "").trim()) { line.style = e.style!.trim(); rec("line", tgt, "style", b.style, line.style); } else ignored.push(`Line ${tgt}: an empty style was ignored.`); }
@@ -69,13 +70,15 @@ export function applyEdits(source: Shipment, edited: FrontendShipment): EditResu
     }
     if (digits(e.hsCode) !== digits(b.hsCode) || (e.hsCode.trim() === "") !== (b.hsCode.trim() === "")) {
       const d = digits(e.hsCode);
-      if (d.length === 10) { htsByStyle[line.style] = d; rec("line", tgt, "hsCode", b.hsCode, d); }
+      if (d.length === 10) { htsByStyle[id] = d; rec("line", tgt, "hsCode", b.hsCode, d); }
       else if (d.length >= 4) { line.hts = d; rec("line", tgt, "hsCode", b.hsCode, `${d} (not a 10-digit HTSUS; classification stays incomplete)`); }
       else if (e.hsCode.trim() !== "") ignored.push(`Line ${tgt}: "${e.hsCode}" is not a usable HS/HTSUS code and was ignored.`);
     }
     keep.push(line);
   }
   let nextNo = Math.max(0, ...source.invoice.lines.map((l) => l.lineNo)) + 1;
+  let idCounter = source.invoice.lines.reduce((m, l) => { const g = /^L(\d+)$/.exec(l.id ?? ""); return g ? Math.max(m, Number(g[1])) : m; }, 0);
+  const nextId = () => `L${++idCounter}`;
   for (const e of edited.lines.filter((l) => !baseById.has(l.id))) {
     const iso = toIso2(e.origin), label = e.style?.trim() || e.description.trim() || "(new line)";
     if (!(e.style?.trim() || e.description.trim()) || !iso || !(e.quantity > 0)) {
@@ -84,10 +87,10 @@ export function applyEdits(source: Shipment, edited: FrontendShipment): EditResu
     }
     const style = e.style?.trim() || `ADDED-${nextNo}`;
     const price = e.unitPrice ?? 0, amount = e.amount ?? Math.round(e.quantity * price * 100) / 100;
-    const added: InvoiceLine = { lineNo: nextNo++, style, description: e.description, quantity: e.quantity, unit: e.unit ?? "PCS", unitPrice: price,
+    const added: InvoiceLine = { id: nextId(), lineNo: nextNo++, style, description: e.description, quantity: e.quantity, unit: e.unit ?? "PCS", unitPrice: price,
       statedAmount: amount, originCountry: iso, isFreeOfCharge: false, addedByBroker: true };
     const d = digits(e.hsCode);
-    if (d.length === 10) htsByStyle[style] = d; else if (d.length >= 4) added.hts = d;
+    if (d.length === 10) htsByStyle[added.id!] = d; else if (d.length >= 4) added.hts = d;
     keep.push(added); rec("line", style, "line", "not on the documents", `added by broker: ${e.quantity} x ${price} = ${amount}`);
   }
   working.invoice.lines = keep;

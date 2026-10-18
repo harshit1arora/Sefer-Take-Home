@@ -3,6 +3,7 @@ import { checkPdf, DEFAULT_MODEL, extractShipment, MAX_FILES, safeName, UploadEr
 import { brokerInputsSchema, formatZodError, regenerateRequestSchema } from "./core/schemas.ts";
 import { validatorStatus } from "./core/validate.ts";
 import { buildEntryResponse } from "./contract.ts";
+import { verifySource } from "./core/sourceProof.ts";
 import type { BrokerInputs, Shipment } from "./core/types.ts";
 
 export interface ApiDeps {
@@ -50,6 +51,11 @@ export async function handleRegenerate(body: unknown, deps: ApiDeps): Promise<Ap
   try {
     const r = regenerateRequestSchema.safeParse(body);
     if (!r.success) return fail(400, "BAD_REQUEST", `Invalid request: ${formatZodError(r.error)}`);
+    // The client-held `source` is only trusted if this server signed it when it extracted the documents. Check the RAW
+    // value (what the browser echoed back), not the schema-normalised copy, so a fabricated or altered source is rejected.
+    const raw = (body as { source?: unknown }).source;
+    if (!verifySource(raw, r.data.sourceProof))
+      return fail(403, "SOURCE_UNVERIFIED", "The extraction data in this request was not produced by this server's extraction (or the server restarted). Re-process the documents to regenerate. Edits are applied on top of a verified extraction only.");
     const opts = { edited: r.data.shipment, ...(r.data.broker ? { broker: r.data.broker as BrokerInputs } : {}), ...(deps.today ? { today: deps.today() } : {}) };
     return { status: 200, body: await buildEntryResponse(r.data.source as Shipment, opts) };
   } catch (e) { return toResult(e, "regenerate"); }

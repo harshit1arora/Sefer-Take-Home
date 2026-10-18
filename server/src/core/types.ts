@@ -2,11 +2,12 @@ export interface Party {
   name: string; address1?: string; city?: string; state?: string; zip?: string; country?: string;
 }
 export interface InvoiceLine {
+  id?: string;                  // stable internal identity, independent of style/lineNo (assigned once)
   lineNo: number; style: string; description: string;
   hts?: string;                 // as printed (often 6-digit HS)
   quantity: number; unit: string; unitPrice: number;
   statedAmount: number;         // as printed on the invoice
-  originCountry: string;        // ISO-2
+  originCountry?: string;       // ISO-2; UNDEFINED when no document states it (never inferred)
   isFreeOfCharge: boolean;
   customsValue?: number;        // value stated "for customs purposes only" (FOC lines)
   assistValue?: number;         // buyer-supplied material not on invoice
@@ -44,7 +45,7 @@ export interface MissingItem { field: string; why: string; blocking: boolean }
 export interface BrokerInputs {
   filerCode?: string; importerTaxId?: string; processingPort?: string; entryPort?: string;
   entryType?: string; suretyCode?: string; locationOfGoods?: string; ultimateConsigneeTaxId?: string;
-  htsByStyle?: Record<string, string>;      // broker-approved 10-digit HTSUS per style
+  htsByStyle?: Record<string, string>;      // broker-approved 10-digit HTSUS, keyed by the line's STABLE id (name kept for compatibility)
   approvals?: Approvals;                    // explicit broker decisions on suggested value components
 }
 /** Explicit broker decisions. Nothing suggested is included in the entered value unless approved here. */
@@ -52,7 +53,7 @@ export interface Approvals { acceptRecomputedAmounts?: string[] | "all"; acceptA
 export interface ValueComponent {
   id: string; label: string; amount: number; provenance: Provenance; included: boolean; basis: string;
 }
-export interface LineValuation { lineNo: number; style: string; components: ValueComponent[]; value: number; valueIfAllSuggestionsAccepted: number }
+export interface LineValuation { id: string; lineNo: number; style: string; components: ValueComponent[]; value: number; valueIfAllSuggestionsAccepted: number }
 export interface Valuation {
   lines: LineValuation[];
   entered: number;                       // sum of included components only

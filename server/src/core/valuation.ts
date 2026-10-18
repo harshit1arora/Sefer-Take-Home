@@ -1,7 +1,9 @@
 import type { Approvals, LineValuation, Shipment, ValueComponent, Valuation } from "./types.ts";
 import { r2 } from "./reconcile.ts";
+import { ensureLineIds } from "./lineIds.ts";
 
-const approvedFor = (list: string[] | "all" | undefined, style: string) => list === "all" || (Array.isArray(list) && list.includes(style));
+/** Approvals are keyed by the line's STABLE id, never by the (repeatable) style code. */
+const approvedFor = (list: string[] | "all" | undefined, lineId: string) => list === "all" || (Array.isArray(list) && list.includes(lineId));
 
 /**
  * Entered value is built ONLY from components that are either printed on the documents (source) or explicitly
@@ -9,12 +11,12 @@ const approvedFor = (list: string[] | "all" | undefined, style: string) => list 
  * The printed invoice amount is never overwritten.
  */
 export function computeValuation(s: Shipment, a: Approvals = {}): Valuation {
-  const inv = s.invoice;
+  const inv = ensureLineIds(s).invoice;
   const lines: LineValuation[] = inv.lines.map((l) => {
     const c: ValueComponent[] = [];
     if (l.isFreeOfCharge) {
       c.push({ id: "foc-customs-value", label: "Customs value printed for free-of-charge samples", amount: l.customsValue ?? l.statedAmount,
-        provenance: "source", included: true, basis: `Invoice line ${l.lineNo}: "value for customs purpose only" (${l.quantity} x ${(l.customsValue ?? l.statedAmount) / l.quantity}). No commercial value; valuation and any 9811.00.60 treatment are broker decisions.` });
+        provenance: "source", included: true, basis: `Invoice line ${l.lineNo}: "value for customs purpose only"${l.quantity > 0 ? ` (${l.quantity} x ${Math.round(((l.customsValue ?? l.statedAmount) / l.quantity) * 100) / 100})` : ""}. No commercial value; valuation and any 9811.00.60 treatment are broker decisions.` });
     } else {
       const overridden = l.amountOverride !== undefined;
       c.push({ id: "invoice-amount", label: l.addedByBroker ? "Amount entered by broker (line not on the documents)" : "Invoice line amount as printed", amount: l.statedAmount,
@@ -24,18 +26,18 @@ export function computeValuation(s: Shipment, a: Approvals = {}): Valuation {
         provenance: "broker_approved", included: true, basis: "Entered by a broker in the workspace; recorded as an edit. The printed amount is preserved above." });
       const calc = r2(l.quantity * l.unitPrice), delta = r2(calc - l.statedAmount);
       if (!overridden && Math.abs(delta) > 0.005) {
-        const ok = approvedFor(a.acceptRecomputedAmounts, l.style);
+        const ok = approvedFor(a.acceptRecomputedAmounts, l.id ?? "");
         c.push({ id: "recomputed-delta", label: `Proposed correction to quantity x unit price (${l.quantity} x ${l.unitPrice} = ${calc.toFixed(2)})`, amount: delta,
           provenance: ok ? "broker_approved" : "suggested", included: ok,
           basis: ok ? "Approved by broker." : "Suggested only. Printed amount and quantity x price disagree; see the finding for the evidence. Which figure was actually paid or payable must be confirmed (for example against the payment record)." });
       }
       if (l.assistValue) {
-        const ok = approvedFor(a.acceptAssist, l.style);
+        const ok = approvedFor(a.acceptAssist, l.id ?? "");
         c.push({ id: "assist", label: "Buyer-supplied material (assist)", amount: l.assistValue, provenance: ok ? "broker_approved" : "suggested", included: ok,
           basis: ok ? "Approved by broker. Amount is the figure stated in the invoice note." : "Suggested only. Invoice note states USD " + l.assistValue.toFixed(2) + " of free fabric. Free materials incorporated in the goods are generally assists (19 U.S.C. 1401a(h)(1)(A)); amount and any added costs need broker confirmation. Kept separate from the invoice amount." });
       }
     }
-    return { lineNo: l.lineNo, style: l.style, components: c,
+    return { id: l.id ?? `L${l.lineNo}`, lineNo: l.lineNo, style: l.style, components: c,
       value: r2(c.filter((x) => x.included).reduce((n, x) => n + x.amount, 0)),
       valueIfAllSuggestionsAccepted: r2(c.filter((x) => x.included || x.provenance === "suggested").reduce((n, x) => n + x.amount, 0)) };
   });

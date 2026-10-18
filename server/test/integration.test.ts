@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { handleEntryUpload, handleHealth, handleRegenerate, type ApiDeps } from "../src/api.ts";
+import { signSource } from "../src/core/sourceProof.ts";
 import { buildEntryResponse, type EntryResponseBody } from "../src/contract.ts";
 import { toFrontendShipment } from "../src/frontendShape.ts";
 import { ExtractionInvalidError, UploadError, MAX_FILE_BYTES } from "../src/core/extract.ts";
@@ -111,13 +112,13 @@ test("the API key never appears in any response body", async () => {
 // ---------- regenerate / edits ----------
 const regen = (mut: (fe: any) => void, broker?: unknown) => {
   const source = sample(); const fe = toFrontendShipment(source); mut(fe);
-  return handleRegenerate({ source, shipment: fe, ...(broker ? { broker } : {}) }, deps());
+  return handleRegenerate({ source, sourceProof: signSource(source), shipment: fe, ...(broker ? { broker } : {}) }, deps());
 };
 
 test("regenerate without edits reproduces the original response", async () => {
   const source = sample();
   const a = await buildEntryResponse(source, { today: TODAY });
-  const r = body(await handleRegenerate({ source, shipment: toFrontendShipment(source) }, deps()));
+  const r = body(await handleRegenerate({ source, sourceProof: signSource(source), shipment: toFrontendShipment(source) }, deps()));
   assert.equal(r["xml"], a.xml); assert.deepEqual(r["edits"], []);
   assert.ok(entryResponseSchema.safeParse(r).success);
 });
@@ -168,7 +169,7 @@ test("edit: summary fields apply, derived origin/destination edits are refused v
 
 test("edit: removing and adding lines are recorded; incomplete added lines are refused", async () => {
   const r = body(await regen((fe) => {
-    fe.lines = fe.lines.filter((l: any) => l.id !== "line-5");
+    fe.lines = fe.lines.filter((l: any) => l.id !== "L5");
     fe.lines.push({ id: "new-1", style: "NB-X1", description: "Socks", hsCode: "", quantity: 10, unit: "PCS", unitPrice: 2, amount: null, origin: "Vietnam" });
     fe.lines.push({ id: "new-2", description: "", hsCode: "", quantity: 0, unitPrice: null, amount: null, origin: "" });
   }));
@@ -182,8 +183,8 @@ test("edit: removing and adding lines are recorded; incomplete added lines are r
 
 test("approvals: only the approved components enter the entered value", async () => {
   const r0 = body(await regen(() => {}));
-  const r1 = body(await regen(() => {}, { approvals: { acceptRecomputedAmounts: ["BP-T101"] } }));
-  const r2 = body(await regen(() => {}, { approvals: { acceptRecomputedAmounts: ["BP-T101"], acceptAssist: ["W-B220"] } }));
+  const r1 = body(await regen(() => {}, { approvals: { acceptRecomputedAmounts: ["L1"] } }));
+  const r2 = body(await regen(() => {}, { approvals: { acceptRecomputedAmounts: ["L1"], acceptAssist: ["L4"] } }));
   assert.deepEqual([r0["valuation"].entered, r1["valuation"].entered, r2["valuation"].entered], [22899, 23259, 27439]);
   assert.equal(r2["valuation"].pending, 0);
   assert.match(r2["xml"], /<total-entry-value>27439<\/total-entry-value>/);
@@ -253,7 +254,7 @@ test("express: multipart upload on `documents`, error statuses, JSON errors, hea
     assert.equal((await fetch(`${base}/api/nope`)).status, 404);
     const health = await fetch(`${base}/api/health`); assert.equal(health.status, 200);
     const source = sample();
-    const rg = await fetch(`${base}/api/entry/regenerate`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ source, shipment: toFrontendShipment(source) }) });
+    const rg = await fetch(`${base}/api/entry/regenerate`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ source, sourceProof: signSource(source), shipment: toFrontendShipment(source) }) });
     assert.equal(rg.status, 200);
     const badJson = await fetch(`${base}/api/entry/regenerate`, { method: "POST", headers: { "content-type": "application/json" }, body: "{oops" });
     assert.equal(badJson.status, 400);

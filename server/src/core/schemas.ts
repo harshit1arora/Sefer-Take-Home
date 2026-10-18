@@ -1,13 +1,15 @@
 import { z } from "zod";
-import { toIso2 } from "./normalize.ts";
+import { isIsoCountry, isRealDate, toIso2 } from "./normalize.ts";
 import type { Shipment } from "./types.ts";
 
 const nonNeg = z.number().finite().nonnegative();
-const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "must be an ISO date (YYYY-MM-DD)");
+const isoDate = z.string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "must be an ISO date (YYYY-MM-DD)")
+  .refine(isRealDate, "must be a real calendar date (e.g. 2026-02-31 is not valid)");
 // Models sometimes answer "Vietnam" instead of "VN"; map known names, then require two letters.
 const iso2 = z.preprocess(
-  (v) => (typeof v === "string" ? (toIso2(v) ?? v.trim()) : v),
-  z.string().regex(/^[A-Za-z]{2}$/, "must be a two-letter ISO country code").transform((s) => s.toUpperCase()),
+  (v) => (typeof v === "string" ? (toIso2(v) ?? (v.trim() || undefined)) : v),
+  z.string().regex(/^[A-Za-z]{2}$/, "must be a two-letter ISO country code").refine(isIsoCountry, "is not an assigned ISO 3166-1 country code").transform((s) => s.toUpperCase()).optional(),
 );
 
 export const partySchema = z.object({
@@ -20,6 +22,7 @@ export const partySchema = z.object({
 });
 
 export const invoiceLineSchema = z.object({
+  id: z.string().min(1).optional(),
   lineNo: z.number().int().positive(),
   style: z.string().min(1),
   description: z.string(),
@@ -28,7 +31,7 @@ export const invoiceLineSchema = z.object({
   unit: z.string().default("PCS"),
   unitPrice: nonNeg,
   statedAmount: nonNeg,
-  originCountry: iso2,
+  originCountry: iso2, // optional: an unstated origin stays UNKNOWN rather than being inferred
   isFreeOfCharge: z.boolean().default(false),
   customsValue: nonNeg.optional(),
   assistValue: nonNeg.optional(),
@@ -108,7 +111,7 @@ export const brokerInputsSchema = z.object({
   suretyCode: short.optional(),
   locationOfGoods: short.optional(),
   ultimateConsigneeTaxId: short.optional(),
-  htsByStyle: z.record(z.string().max(60), z.string().max(20)).optional(),
+  htsByStyle: z.record(z.string().max(60), z.string().max(20)).optional(), // keyed by the line's stable id
   approvals: approvalsSchema.optional(),
 });
 
@@ -148,6 +151,7 @@ export const frontendShipmentSchema = z.object({
 
 export const regenerateRequestSchema = z.object({
   source: shipmentSchema,
+  sourceProof: z.string().max(200).optional(), // checked against the RAW source in handleRegenerate (api.ts)
   shipment: frontendShipmentSchema,
   broker: brokerInputsSchema.optional(),
 });
