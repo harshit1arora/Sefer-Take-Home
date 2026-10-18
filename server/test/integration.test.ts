@@ -52,6 +52,8 @@ test("source values flow unchanged: T-shirt 6480, hoodie qty, origins, samples, 
   const titles: string[] = r["findings"].map((f: any) => f.title);
   for (const t of ["Quantity differs between invoice and packing list", "Mixed countries of origin", "Free-of-charge samples need valuation review", "Container number was corrected by hand on the B/L",
     "Tariff classification remains incomplete", "Missing before filing: importer-tax-id", "Missing before filing: processing-port", "Missing before filing: surety-code / bond"]) assert.ok(titles.includes(t), `missing finding: ${t}`);
+  const tariffFinding = r["findings"].find((f: any) => f.title === "Tariff classification remains incomplete");
+  assert.match(tariffFinding.description, /source 6-digit HS codes.*draft XML.*NOT approved 10-digit HTSUS.*do not clear this filing blocker/i);
   assert.equal(r["readiness"].readyToFile, false);
   assert.ok(!/tariff-no>\d{10}</.test(r["xml"]), "no 10-digit HTSUS may appear unless supplied by a broker");
   assert.doesNotMatch(r["xml"], /<importer-tax-id>/);

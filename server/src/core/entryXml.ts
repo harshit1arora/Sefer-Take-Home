@@ -21,7 +21,8 @@ export function buildEntry(s: Shipment, b: BrokerInputs = {}, opts: { today: str
   const fit = (label: string, v: string | undefined, max: number): string | undefined => {
     if (v === undefined) return undefined;
     if (v.length <= max) return v;
-    miss(label, `The ${label} is ${v.length} characters but the schema field allows ${max}. It was cut to ${max} characters in the XML, so the XML does not carry the documented value. Shorten the source value or confirm a supported transformation before filing.`);
+    asm(`${label} (full source)`, v, "broker_confirm", `The complete ${label} was extracted from the source documents. The XML header field is limited to ${max} characters and contains only the truncated value below.`);
+    miss(label, `The full source ${label} is ${v.length} characters but the XML schema allows ${max}. The generated XML field was cut to ${max} characters and may end mid-phrase; it is not the complete source value. The full source value is retained in the audit trail. Shorten or approve a supported replacement before filing.`);
     return v.slice(0, max);
   };
   if (bol.goodsDescription === undefined) miss("goods description", "No goods description was found on the documents; the header description is omitted rather than defaulted.", false);

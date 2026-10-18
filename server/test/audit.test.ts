@@ -85,6 +85,19 @@ test("XML integrity: control characters are stripped + flagged; over-length fiel
   assert.ok(r2.missing.some((m) => /goods description/.test(m.field)), "long description flagged");
 });
 
+test("a truncated header description preserves the full source value and warns that XML is incomplete", async () => {
+  const s = sample();
+  s.bol.goodsDescription = "MEN'S AND WOMEN'S COTTON APPAREL SHIPPED IN CARTONS FOR RETAIL DISTRIBUTION WITH ASSORTED SIZES";
+  const r = await processShipment(s, {}, T);
+  const emitted = /<description>([^<]+)<\/description>/.exec(r.xml)?.[1];
+  assert.equal(emitted?.length, 70, "schema-sized description is emitted");
+  assert.notEqual(emitted, s.bol.goodsDescription, "full source value is not silently represented as the XML value");
+  const warning = r.missing.find((m) => m.field === "goods description");
+  assert.ok(warning?.blocking); assert.match(warning!.why, /truncated|mid-phrase|full source/i);
+  assert.ok(r.assumptions.some((a) => a.field === "goods description (full source)" && a.value === s.bol.goodsDescription && a.status === "broker_confirm"));
+  assert.equal(r.readyToFile, false);
+});
+
 test("a filer code does not silently invent an entry number", async () => {
   const r = await processShipment(sample(), { filerCode: "ABC" }, T);
   assert.ok(r.assumptions.some((a) => a.field === "entry-no" && /placeholder|not a real/i.test(a.basis)));

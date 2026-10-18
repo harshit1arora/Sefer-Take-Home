@@ -78,7 +78,7 @@ export function mapFindings(findings: Finding[], missing: MissingItem[], valuati
   }
   const noHts = findings.filter((f) => f.code === "HTS10_MISSING");
   if (noHts.length) push({ severity: "missing", title: "Tariff classification remains incomplete",
-    description: `${noHts.length} line${noHts.length > 1 ? "s have" : " has"} no approved 10-digit HTSUS number: ${noHts.map((f) => /\((.+?)\)/.exec(f.message)?.[1] ?? "?").join(", ")}. The documents carry only 6-digit HS codes; nothing is inferred. A broker must supply the classifications.`,
+    description: `${noHts.length} line${noHts.length > 1 ? "s have" : " has"} no approved 10-digit HTSUS number: ${noHts.map((f) => /\((.+?)\)/.exec(f.message)?.[1] ?? "?").join(", ")}. The source 6-digit HS codes may still appear in draft XML for traceability, but they are NOT approved 10-digit HTSUS classifications and do not clear this filing blocker. Nothing is inferred; a broker must supply the classifications.`,
     action: "Edit line items", target: "lines" });
   if (valuation.pending) push({ severity: "review", title: "Suggested value changes await broker approval",
     description: `${valuation.pending} suggested component${valuation.pending > 1 ? "s are" : " is"} excluded from the entered value (${valuation.entered.toFixed(2)} USD). Approving all would make it ${valuation.enteredIfAllSuggestionsAccepted.toFixed(2)} USD.`,
