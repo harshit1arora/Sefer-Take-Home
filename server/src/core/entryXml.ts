@@ -131,6 +131,7 @@ export function buildEntry(s: Shipment, b: BrokerInputs = {}, opts: { today: str
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <entry xmlns="http://www.netchb.com/xml/entry">
+  <!-- DRAFT ENTRY SUMMARY ONLY - NOT FOR OFFICIAL CBP/NETCHB SUBMISSION WITHOUT LICENSED BROKER REVIEW AND COMPLETED FIELDS -->
   ${b.filerCode ? `<entry-no><user-specified>${tag("filer-code", b.filerCode)}<entry-no>0000000</entry-no></user-specified></entry-no>` : "<entry-no><system-generated/></entry-no>"}
   ${tag("external-reference-number", inv.po)}
   <header>

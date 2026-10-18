@@ -15,8 +15,14 @@ export function computeValuation(s: Shipment, a: Approvals = {}): Valuation {
   const lines: LineValuation[] = inv.lines.map((l) => {
     const c: ValueComponent[] = [];
     if (l.isFreeOfCharge) {
-      c.push({ id: "foc-customs-value", label: "Customs value printed for free-of-charge samples", amount: l.customsValue ?? l.statedAmount,
-        provenance: "source", included: true, basis: `Invoice line ${l.lineNo}: "value for customs purpose only"${l.quantity > 0 ? ` (${l.quantity} x ${Math.round(((l.customsValue ?? l.statedAmount) / l.quantity) * 100) / 100})` : ""}. No commercial value; valuation and any 9811.00.60 treatment are broker decisions.` });
+      // If customsValue was extracted as per-unit (matching unitPrice) while quantity > 1, compute total;
+      // otherwise use customsValue as total line amount, falling back to statedAmount.
+      const rawCustoms = l.customsValue ?? l.statedAmount;
+      const totalCustoms = (l.customsValue !== undefined && l.quantity > 1 && Math.abs(l.customsValue - l.unitPrice) < 0.005 && l.statedAmount > l.customsValue)
+        ? r2(l.customsValue * l.quantity)
+        : rawCustoms;
+      c.push({ id: "foc-customs-value", label: "Customs value printed for free-of-charge samples", amount: totalCustoms,
+        provenance: "source", included: true, basis: `Invoice line ${l.lineNo}: "value for customs purpose only"${l.quantity > 0 ? ` (${l.quantity} x ${Math.round((totalCustoms / l.quantity) * 100) / 100})` : ""}. No commercial value; valuation and any 9811.00.60 treatment are broker decisions.` });
     } else {
       const overridden = l.amountOverride !== undefined;
       c.push({ id: "invoice-amount", label: l.addedByBroker ? "Amount entered by broker (line not on the documents)" : "Invoice line amount as printed", amount: l.statedAmount,

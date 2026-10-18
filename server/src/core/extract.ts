@@ -70,7 +70,7 @@ Party={"name":str,"address1":str?,"city":str?,"state":str?,"zip":str?,"country":
   country or a default. An omitted origin is the correct answer when the documents are silent.
 - For free-of-charge lines (marked FOC / No Commercial Value / Free of Charge / Sample): set isFreeOfCharge=true.
   Preserve the printed commercial line amount in statedAmount (if a line prints 0, extract 0; if a line prints 24.00 or (24.00), extract 24.00).
-  Place any separately printed customs-purpose value in customsValue.
+  Place any separately printed total customs-purpose value in customsValue (e.g. if an invoice states "Value for customs purpose only USD 1.00/pc" for 24 pcs, or states a total customs value of 24.00, customsValue is 24.00, representing the total line customs value).
   Never substitute statedAmount and customsValue for one another, invent a zero when a non-zero number is printed, or output a negative number.
   Put a buyer-supplied free material value in assistValue only if a document states it.
 - NEVER invent an HTS/HS code, tax ID, bond, importer number or any value that is not on the documents; omit unknown fields.

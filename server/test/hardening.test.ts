@@ -7,6 +7,7 @@ import { isRealDate, normalizeContainerSize, parseDocDate, sanitizeInvoiceNo, sp
 import { assertShipment, ExtractionInvalidError } from "../src/core/extract.ts";
 import { reconcile } from "../src/core/reconcile.ts";
 import { computeValuation } from "../src/core/valuation.ts";
+import { ensureLineIds } from "../src/core/lineIds.ts";
 import { isBlockingFinding, INFORMATIONAL_FINDINGS } from "../src/core/readiness.ts";
 import type { Shipment } from "../src/core/types.ts";
 
@@ -181,4 +182,62 @@ test("schema accepts free-of-charge lines preserving printed commercial amount a
   assert.equal(validated.invoice.lines[4].customsValue, 24);
   assert.equal(validated.invoice.lines[4].isFreeOfCharge, true);
 });
+
+// ---- Regression tests for verified Sefer XML/value issues ----
+
+test("free-of-charge samples: computes total line value of 24.00 even if customsValue was extracted per-unit", () => {
+  const s = sample();
+  const foc = s.invoice.lines[4];
+  foc.isFreeOfCharge = true;
+  foc.quantity = 24;
+  foc.unitPrice = 1.0;
+  foc.statedAmount = 24;
+  foc.customsValue = 1.0; // per-unit customs value extracted
+  const v = computeValuation(s);
+  assert.equal(v.lines[4].value, 24.0);
+  assert.equal(v.entered, 22899.0);
+});
+
+test("reconciliation of totals: printed commercial lines 1-4 sum to 22875; FOB total 23235; printed CIF 27270", () => {
+  const s = sample();
+  const paidLines = s.invoice.lines.filter((l) => !l.isFreeOfCharge);
+  const paidCommercialSum = paidLines.reduce((acc, l) => acc + l.statedAmount, 0);
+  assert.equal(paidCommercialSum, 22875);
+  assert.equal(s.invoice.statedFobTotal, 23235);
+  assert.equal(s.invoice.freight, 3850);
+  assert.equal(s.invoice.insurance, 185);
+  assert.equal(s.invoice.statedTotal, 27270);
+
+  // Line 1 calculation: 2400 x 2.85 = 6840 vs printed 6480 (delta 360)
+  const line1Calc = s.invoice.lines[0].quantity * s.invoice.lines[0].unitPrice;
+  assert.equal(line1Calc, 6840);
+  assert.equal(s.invoice.lines[0].statedAmount, 6480);
+  const vDefault = computeValuation(s);
+  // Unapproved: printed amount 6480 is preserved; 360 delta is suggested only
+  assert.equal(vDefault.lines[0].value, 6480);
+  const deltaComp = vDefault.lines[0].components.find((c) => c.id === "recomputed-delta");
+  assert.ok(deltaComp && deltaComp.provenance === "suggested" && !deltaComp.included);
+
+  // Approving 360 delta updates entered value cleanly
+  const withIds = ensureLineIds(s);
+  const line1Id = withIds.invoice.lines[0].id!;
+  const vApproved = computeValuation(s, { acceptRecomputedAmounts: [line1Id] });
+  assert.equal(vApproved.lines[0].value, 6840);
+  assert.equal(vApproved.entered, 23259);
+
+  // Approving assist 4180 updates entered value cleanly
+  const line4Id = withIds.invoice.lines[3].id!;
+  const vAssist = computeValuation(s, { acceptAssist: [line4Id] });
+  assert.equal(vAssist.entered, 27079);
+});
+
+test("readiness policy: sentinel port 0000, missing importer tax ID, truncation and missing HTS10 block filing", async () => {
+  const { processShipment } = await import("../src/core/pipeline.ts");
+  const s = sample();
+  const res = await processShipment(s, {}, "2026-10-18");
+  assert.equal(res.readyToFile, false, "Must not be ready to file with missing broker inputs and assumptions");
+  assert.match(res.readinessNote, /NOT ready to file/);
+  assert.ok(res.xml.includes("DRAFT ENTRY SUMMARY ONLY"), "XML must be explicitly labeled as DRAFT");
+});
+
 
