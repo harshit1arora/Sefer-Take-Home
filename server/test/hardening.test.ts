@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isRealDate, normalizeContainerSize, parseDocDate, sanitizeInvoiceNo, splitBill } from "../src/core/normalize.ts";
-import { assertShipment } from "../src/core/extract.ts";
+import { assertShipment, ExtractionInvalidError } from "../src/core/extract.ts";
 import { reconcile } from "../src/core/reconcile.ts";
 import { computeValuation } from "../src/core/valuation.ts";
 import { isBlockingFinding, INFORMATIONAL_FINDINGS } from "../src/core/readiness.ts";
@@ -141,3 +141,44 @@ test("an invoice number with no usable characters is a blocking finding", () => 
   assert.ok(f, "empty invoice number flagged");
   assert.equal(isBlockingFinding("INVOICE_NO_EMPTY"), true);
 });
+
+// Regression: production extraction failure where Gemini extracted parenthesized amount as negative statedAmount
+test("schema rejects negative statedAmount with clear path identifying line and field", () => {
+  const s = sample();
+  (s.invoice.lines[4] as any).statedAmount = -24;
+  assert.throws(
+    () => assertShipment(s),
+    (err: unknown) => {
+      assert.ok(err instanceof ExtractionInvalidError);
+      const e = err as Error;
+      assert.match(e.message, /invoice\.lines\.4\.statedAmount/);
+      assert.match(e.message, /greater than or equal to 0/i);
+      return true;
+    }
+  );
+});
+
+test("schema accepts free-of-charge lines with zero commercial amount and separate customs value", () => {
+  const s = sample();
+  const foc = s.invoice.lines[4];
+  foc.isFreeOfCharge = true;
+  foc.statedAmount = 0;
+  foc.customsValue = 24;
+  const validated = assertShipment(s);
+  assert.equal(validated.invoice.lines[4].statedAmount, 0);
+  assert.equal(validated.invoice.lines[4].customsValue, 24);
+  assert.equal(validated.invoice.lines[4].isFreeOfCharge, true);
+});
+
+test("schema accepts free-of-charge lines preserving printed commercial amount and separate customs value", () => {
+  const s = sample();
+  const foc = s.invoice.lines[4];
+  foc.isFreeOfCharge = true;
+  foc.statedAmount = 24;
+  foc.customsValue = 24;
+  const validated = assertShipment(s);
+  assert.equal(validated.invoice.lines[4].statedAmount, 24);
+  assert.equal(validated.invoice.lines[4].customsValue, 24);
+  assert.equal(validated.invoice.lines[4].isFreeOfCharge, true);
+});
+
