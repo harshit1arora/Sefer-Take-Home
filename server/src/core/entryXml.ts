@@ -1,6 +1,5 @@
 import type { Assumption, BrokerInputs, BuildResult, MissingItem, Shipment } from "./types.ts";
 import { cleanContainerNumber, foreignPort, normalizeContainerSize, sanitizeInvoiceNo, splitBill, toIso2, usPort } from "./normalize.ts";
-import { buildMid } from "./mid.ts";
 import { computeValuation } from "./valuation.ts";
 
 // XML 1.0 forbids most C0 control characters. Strip them before escaping so they can never produce malformed XML;
@@ -45,16 +44,21 @@ export function buildEntry(s: Shipment, b: BrokerInputs = {}, opts: { today: str
   const entryType = b.entryType ?? "01";
   if (!b.entryType) asm("entry-type", "01", "assumed", "Formal consumption entry assumed because entered value is above the informal threshold; broker decides entry type.");
   asm("mode-transportation", "11", "assumed", "11 is accepted by modeTransportType; meaning 'vessel, containerized' recalled from CBP ABI code lists, not re-verified.");
-  asm("state-destination", inv.shipTo?.state ?? "", "derived", "State of the ship-to address on the invoice and B/L.");
-  asm("carrier-code", bol.masterScac ?? "", "derived", "SCAC of the ocean carrier named on the B/L.");
+  // Do not put empty placeholders in the assumptions response. Those records are
+  // rendered directly by the client; an absent source value is missing data, not
+  // a derived value with an empty string.
+  if (inv.shipTo?.state) asm("state-destination", inv.shipTo.state, "derived", "State of the ship-to address on the invoice and B/L.");
+  else miss("state-destination", "The ship-to state is not stated on the documents; it is omitted rather than inferred.", false);
+  if (bol.masterScac) asm("carrier-code", bol.masterScac, "derived", "SCAC of the ocean carrier named on the B/L.");
+  else miss("carrier-code", "No master-carrier SCAC was found on the B/L; it is omitted rather than inferred.", false);
   asm("gross-weight", String(Math.round(bol.grossKg)), "derived", "Gross weight declared on the B/L (see findings for any cross-document difference).");
   const charges = (inv.freight ?? 0) + (inv.insurance ?? 0);
   if (charges) asm("charges", String(Math.round(charges)), "assumed", "Freight + insurance as non-dutiable charges (CIF). Semantics of header 'charges' not confirmed in the XSD; verify.");
   asm("entry-date", opts.today, "assumed", "Set to the generation date; the broker sets the real filing/entry date.");
-  if (bol.etaDate) asm("arrival-date", bol.etaDate, "assumed", "Estimated arrival date from the invoice; update on arrival.");
+  if (bol.etaDate) asm("arrival-date", bol.etaDate, "assumed", "Estimated arrival date from the B/L; update on arrival.");
   if (!b.importerTaxId) miss("importer-tax-id", "Importer of record EIN/CBP number is not on any document (required unless entry type 86).");
   if (!b.suretyCode) miss("surety-code / bond", "No bond information on the documents.");
-  if (!b.locationOfGoods) miss("location-of-goods (FIRMS)", "Needed for cargo release; not on the documents.", false);
+  if (!b.locationOfGoods) miss("location-of-goods (FIRMS)", "Needed for cargo release; not on the documents.");
   if (!b.ultimateConsigneeTaxId) miss("ultimate-consignee", "The importer vs the 3PL ship-to consignee is a broker decision; the element is omitted.", false);
   miss("related-party (Y/N)", "Relationship between seller and buyer not stated.", false);
 
@@ -74,11 +78,9 @@ export function buildEntry(s: Shipment, b: BrokerInputs = {}, opts: { today: str
   if (inNo.truncated) { asm("invoice-no truncated", inNo.value, "broker_confirm", `"${inv.number}" exceeds 17 characters and was truncated for the schema; confirm the full value and check it does not collide with another entry.`); miss("invoice number", "The invoice number was truncated to 17 characters; confirm the full value with the shipper.", false); }
   const V = computeValuation(s, b.approvals);
   const exportDate = bol.onBoardDate;
-  // Country of export comes ONLY from the B/L port of loading. It is never defaulted to a hardcoded country, and it is
-  // NOT copied from a line's country of origin (origin and export are different concepts).
-  const countryExport = toIso2(bol.portOfLoading?.split(",").pop());
-  if (countryExport) asm("country-export", countryExport, "assumed", `Derived from the port of loading "${bol.portOfLoading}" on the B/L. Country of export is a broker decision; confirm it.`);
-  else miss("country-export", "The port of loading on the B/L does not resolve to a country; country of export is omitted rather than assumed.", false);
+  // A loading port is useful shipment context, but it does not establish a country of export. Country of export is
+  // emitted only from an explicit source line value or valid, approved broker line evidence; it is never copied from
+  // country of origin or inferred from a port.
   if (lading) asm("lading-port", lading.code, lading.status, lading.basis);
 
   const byLine: { style: string; value: number }[] = V.lines.map((x) => ({ style: x.style, value: x.value }));
@@ -89,18 +91,57 @@ export function buildEntry(s: Shipment, b: BrokerInputs = {}, opts: { today: str
   }
   const lines = inv.lines.map((l, idx) => {
     const value = V.lines[idx].value;
-    const hts = b.htsByStyle?.[l.id ?? ""] ?? (l.hts ?? "").replace(/\D/g, "");
-    if (!b.htsByStyle?.[l.id ?? ""]) {
+    const brokerHts = b.htsByStyle?.[l.id ?? ""];
+    // Validate here too: buildEntry is also used directly by tests and integrations, which need the same guard as
+    // the request schema. A malformed broker value must never turn an unresolved classification into XML content.
+    const approvedBrokerHts = brokerHts && /^\d{10}$/.test(brokerHts) ? brokerHts : undefined;
+    // Retain the source-stated HS fragment in draft XML for traceability and schema structure, but it is never
+    // treated as a fileable classification: readiness remains blocked until an explicitly broker-supplied 10-digit
+    // value replaces it. A malformed broker replacement cannot enter this field or clear that blocker.
+    const hts = approvedBrokerHts ?? (l.hts ?? "").replace(/\D/g, "");
+    if (approvedBrokerHts) {
+      asm(`HTSUS 10-digit for ${l.style}`, approvedBrokerHts, "broker_supplied", "Supplied as a 10-digit broker classification. Classification approval remains a broker responsibility.");
+    } else {
+      if (brokerHts) asm(`HTSUS 10-digit for ${l.style}`, brokerHts, "broker_confirm", "Broker-supplied HTSUS is not exactly 10 digits; it is omitted as an approved classification.");
       miss(`HTSUS 10-digit for ${l.style}`, `Only "${l.hts}" is on the documents. The XSD accepts 5-10 digits, so a 6-digit value passes validation but is not a fileable classification.`);
     }
     if (l.originCountry === undefined) miss(`country-of-origin for ${l.style}`, "No document states the country of origin for this line; it is required and is never inferred.", true);
-    const mfr = l.manufacturer ?? s.factory;
-    const mid = buildMid(mfr, l.originCountry);
-    asm(`manufacturer-id ${l.style}`, mid.mid ?? "", mid.mid ? "derived" : "assumed", `MID ${mid.note} per 19 CFR Part 102 Appendix. Broker must confirm against the manufacturer's legal name and address.`);
+    const evidence = b.lineEvidence?.[l.id ?? ""];
+    const suppliedManufacturerId = evidence?.manufacturerId;
+    // IDs must fit the bundled schema's 15-character manufacturer field. A malformed source value remains visible
+    // in the audit trail, but is not emitted as a schema-looking manufacturer ID.
+    const sourceManufacturerId = l.manufacturerId?.trim();
+    const validSourceManufacturerId = sourceManufacturerId && /^[A-Za-z0-9-]{1,15}$/.test(sourceManufacturerId)
+      ? sourceManufacturerId
+      : undefined;
+    // Broker MIDs have the same intentionally narrow, conservative format. Direct callers get the same protection
+    // as the request schema and cannot turn a malformed value into XML content.
+    const approvedBrokerManufacturerId = suppliedManufacturerId?.approved && /^[A-Za-z0-9-]{1,15}$/.test(suppliedManufacturerId.value)
+      ? suppliedManufacturerId.value
+      : undefined;
+    const manufacturerId = validSourceManufacturerId ?? approvedBrokerManufacturerId;
+    if (validSourceManufacturerId) asm(`manufacturer-id ${l.style}`, validSourceManufacturerId, "verified", "Identifier explicitly extracted from the source documents.");
+    else if (approvedBrokerManufacturerId) asm(`manufacturer-id ${l.style}`, approvedBrokerManufacturerId, "broker_supplied", sourceManufacturerId ? "Supplied and explicitly approved by the broker after the extracted value failed the supported format; the source value remains available for review." : "Supplied and explicitly approved by the broker; not present in the extracted documents.");
+    else if (sourceManufacturerId) asm(`manufacturer-id ${l.style}`, sourceManufacturerId, "broker_confirm", "Value was extracted from the source documents but does not fit the supported manufacturer-ID format (1-15 letters, numbers, or hyphens); omitted from XML pending broker confirmation.");
+    else {
+      if (suppliedManufacturerId) asm(`manufacturer-id ${l.style}`, suppliedManufacturerId.value, "broker_confirm", suppliedManufacturerId.approved ? "Broker-supplied manufacturer ID fails the supported format (1-15 letters, numbers, or hyphens); omitted from XML." : "Supplied by the broker but not approved; omitted from XML until approval.");
+      miss(`manufacturer-id for ${l.style}`, "No approved manufacturer ID is available. It is omitted rather than constructed from company or location details.");
+    }
+    const suppliedCountryExport = evidence?.countryOfExport;
+    const sourceCountryExport = toIso2(l.exportCountry);
+    const approvedBrokerCountryExport = suppliedCountryExport?.approved ? toIso2(suppliedCountryExport.value) : undefined;
+    const countryExport = sourceCountryExport ?? approvedBrokerCountryExport;
+    if (sourceCountryExport) asm(`country-export ${l.style}`, sourceCountryExport, "verified", "Country of export explicitly extracted for this line.");
+    else if (approvedBrokerCountryExport) asm(`country-export ${l.style}`, approvedBrokerCountryExport, "broker_supplied", l.exportCountry ? "Supplied and explicitly approved by the broker after the extracted value was not a recognised ISO country; the source value remains available for review." : "Supplied and explicitly approved by the broker; not present in the extracted documents.");
+    else if (l.exportCountry) asm(`country-export ${l.style}`, l.exportCountry, "broker_confirm", "Value was extracted from the source documents but is not a recognised ISO country; omitted from XML pending broker confirmation.");
+    else {
+      if (suppliedCountryExport) asm(`country-export ${l.style}`, suppliedCountryExport.value, "broker_confirm", suppliedCountryExport.approved ? "Broker-supplied country of export is not a recognised ISO country; omitted from XML." : "Supplied by the broker but not approved; omitted from XML until approval.");
+      miss(`country-export for ${l.style}`, "No approved line-specific country-of-export evidence is available.");
+    }
     return `    <line-item>
       ${tag("export-date", exportDate)}
       ${tag("country-origin", l.originCountry)}
-      ${tag("manufacturer-id", mid.mid)}
+      ${tag("manufacturer-id", manufacturerId)}
       <tariffs><tariff>
         ${tag("tariff-no", hts)}
         ${tag("value", value.toFixed(2))}
@@ -148,7 +189,7 @@ export function buildEntry(s: Shipment, b: BrokerInputs = {}, opts: { today: str
     ${tag("gross-weight", Math.round(bol.grossKg))}
     ${tag("total-entry-value", Math.round(entered))}
     ${tag("description", fit("goods description", bol.goodsDescription, 70))}
-    ${tag("state-destination", inv.shipTo?.state ?? inv.buyer.state)}
+    ${tag("state-destination", inv.shipTo?.state)}
     ${tag("vessel-name", fit("vessel name", bol.vessel, 20))}
     ${tag("mode-transportation", "11")}
     ${tag("unlading-port", disch?.code)}

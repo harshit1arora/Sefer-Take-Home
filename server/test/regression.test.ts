@@ -106,13 +106,14 @@ test("missing broker inputs are listed, blocking, and visible in the XML", async
   assert.match(r.readinessNote, /NOT ready to file/);
 });
 
-test("even with every broker input and approval, ready stays false while assumptions remain", async () => {
+test("even with every broker input and approval, ready stays false while source evidence is missing", async () => {
   const hts = { "L1": "6109100012", "L2": "6110203079", "L3": "6203424011", "L4": "6206400030", "L5": "6106100010" };
   const r = await processShipment(sample(), { importerTaxId: "12-3456789", processingPort: "3001", suretyCode: "999", entryType: "01", entryPort: "3002",
     locationOfGoods: "T123", htsByStyle: hts, approvals: { acceptRecomputedAmounts: "all", acceptAssist: "all" } }, T);
   assert.equal(r.validation.valid, true, r.validation.errors.join("\n"));
-  assert.equal(r.missing.filter((m) => m.blocking).length, 0);
-  assert.equal(r.readyToFile, false, "assumed fields (mode, SCAC split, charges...) and document errors remain");
+  assert.ok(r.missing.some((m) => m.field === "manufacturer-id for BP-T101" && m.blocking));
+  assert.ok(r.missing.some((m) => m.field === "country-export for BP-P118S" && m.blocking));
+  assert.equal(r.readyToFile, false, "required manufacturer and export-country evidence remains missing");
 });
 
 // ---------- 6. malformed extraction output ----------

@@ -8,10 +8,12 @@ export interface InvoiceLine {
   quantity: number; unit: string; unitPrice: number;
   statedAmount: number;         // as printed on the invoice
   originCountry?: string;       // ISO-2; UNDEFINED when no document states it (never inferred)
+  exportCountry?: string;       // ISO-2; source-stated country of export for this line, never inferred from origin
   isFreeOfCharge: boolean;
   customsValue?: number;        // value stated "for customs purposes only" (FOC lines)
   assistValue?: number;         // buyer-supplied material not on invoice
   manufacturer?: Party;         // overrides shipment-level factory
+  manufacturerId?: string;      // identifier printed on a source document; never synthesized as verified
   amountOverride?: number;      // broker-entered amount; the printed statedAmount is never overwritten
   addedByBroker?: boolean;      // line does not exist on the documents
 }
@@ -38,7 +40,7 @@ export interface Shipment {
 }
 export type Severity = "error" | "warn" | "info";
 export interface Finding { severity: Severity; code: string; message: string }
-export type AssumptionStatus = "verified" | "derived" | "assumed" | "broker_confirm" | "broker_approved";
+export type AssumptionStatus = "verified" | "derived" | "assumed" | "broker_confirm" | "broker_approved" | "broker_supplied";
 export type Provenance = "source" | "derived" | "suggested" | "broker_approved";
 export interface Assumption { field: string; value: string; status: AssumptionStatus; basis: string }
 export interface MissingItem { field: string; why: string; blocking: boolean }
@@ -46,7 +48,12 @@ export interface BrokerInputs {
   filerCode?: string; importerTaxId?: string; processingPort?: string; entryPort?: string;
   entryType?: string; suretyCode?: string; locationOfGoods?: string; ultimateConsigneeTaxId?: string;
   htsByStyle?: Record<string, string>;      // broker-approved 10-digit HTSUS, keyed by the line's STABLE id (name kept for compatibility)
+  lineEvidence?: Record<string, BrokerLineEvidence>; // keyed by stable line id; values are never applied without approval
   approvals?: Approvals;                    // explicit broker decisions on suggested value components
+}
+export interface BrokerLineEvidence {
+  manufacturerId?: { value: string; approved: boolean };
+  countryOfExport?: { value: string; approved: boolean };
 }
 /** Explicit broker decisions. Nothing suggested is included in the entered value unless approved here. */
 export interface Approvals { acceptRecomputedAmounts?: string[] | "all"; acceptAssist?: string[] | "all" }

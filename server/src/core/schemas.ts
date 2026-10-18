@@ -32,10 +32,12 @@ export const invoiceLineSchema = z.object({
   unitPrice: nonNeg,
   statedAmount: nonNeg,
   originCountry: iso2, // optional: an unstated origin stays UNKNOWN rather than being inferred
+  exportCountry: iso2, // optional: origin and export are distinct; do not infer either from the other
   isFreeOfCharge: z.boolean().default(false),
   customsValue: nonNeg.optional(),
   assistValue: nonNeg.optional(),
   manufacturer: partySchema.optional(),
+  manufacturerId: z.string().trim().min(1).max(30).optional(),
   amountOverride: nonNeg.optional(),
   addedByBroker: z.boolean().optional(),
 });
@@ -102,6 +104,15 @@ export const approvalsSchema = z.object({
   acceptAssist: styleList.optional(),
 });
 const short = z.string().trim().max(60);
+const brokerManufacturerId = z.string().trim().min(1).max(15).regex(/^[A-Za-z0-9-]+$/, "must contain only letters, numbers, or hyphens");
+const brokerCountry = z.preprocess(
+  (v) => (typeof v === "string" ? (toIso2(v) ?? v.trim()) : v),
+  z.string().regex(/^[A-Za-z]{2}$/, "must be a two-letter ISO country code").refine(isIsoCountry, "must be an assigned ISO 3166-1 country code").transform((s) => s.toUpperCase()),
+);
+const brokerEvidenceSchema = z.object({
+  manufacturerId: z.object({ value: brokerManufacturerId, approved: z.boolean() }).optional(),
+  countryOfExport: z.object({ value: brokerCountry, approved: z.boolean() }).optional(),
+}).refine((value) => value.manufacturerId !== undefined || value.countryOfExport !== undefined, "must contain manufacturerId or countryOfExport");
 export const brokerInputsSchema = z.object({
   filerCode: short.optional(),
   importerTaxId: short.optional(),
@@ -111,7 +122,8 @@ export const brokerInputsSchema = z.object({
   suretyCode: short.optional(),
   locationOfGoods: short.optional(),
   ultimateConsigneeTaxId: short.optional(),
-  htsByStyle: z.record(z.string().max(60), z.string().max(20)).optional(), // keyed by the line's stable id
+  htsByStyle: z.record(z.string().max(60), z.string().regex(/^\d{10}$/, "must be exactly 10 digits")).optional(), // keyed by the line's stable id
+  lineEvidence: z.record(z.string().min(1).max(60), brokerEvidenceSchema).refine((value) => Object.keys(value).length <= 200, "at most 200 line evidence records").optional(),
   approvals: approvalsSchema.optional(),
 });
 

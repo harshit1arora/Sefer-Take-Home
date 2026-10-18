@@ -29,7 +29,7 @@ export const valuationSchema = z.object({
   entered: z.number(), enteredIfAllSuggestionsAccepted: z.number(), pending: z.number(), method: z.string(),
   excluded: z.array(z.object({ label: z.string(), amount: z.number(), why: z.string() })),
 });
-export const assumptionSchema = z.object({ field: z.string(), value: z.string(), status: z.enum(['verified', 'derived', 'assumed', 'broker_confirm', 'broker_approved']), basis: z.string() });
+export const assumptionSchema = z.object({ field: z.string(), value: z.string(), status: z.enum(['verified', 'derived', 'assumed', 'broker_confirm', 'broker_approved', 'broker_supplied']), basis: z.string() });
 export const missingItemSchema = z.object({ field: z.string(), why: z.string(), blocking: z.boolean() });
 export const editRecordSchema = z.object({ scope: z.enum(['summary', 'line']), target: z.string(), field: z.string(), original: z.string(), edited: z.string() });
 export const readinessSchema = z.object({
@@ -39,7 +39,7 @@ export const readinessSchema = z.object({
 export const entryResponseSchema = z.object({
   shipment: shipmentSchema, findings: z.array(findingSchema), xml: z.string(),
   validation: z.object({ syntax: validationCheckSchema, xsd: validationCheckSchema, netchb: validationCheckSchema }),
-  source: z.record(z.unknown()).optional(), valuation: valuationSchema.optional(), assumptions: z.array(assumptionSchema).optional(),
+  source: z.record(z.unknown()).optional(), sourceProof: z.string().optional(), valuation: valuationSchema.optional(), assumptions: z.array(assumptionSchema).optional(),
   missing: z.array(missingItemSchema).optional(), edits: z.array(editRecordSchema).optional(), readiness: readinessSchema.optional(),
 });
 export const serviceStatusSchema = z.object({
@@ -56,7 +56,8 @@ export type ValidationCheck = z.infer<typeof validationCheckSchema>;
 export type Valuation = z.infer<typeof valuationSchema>;
 export type ValueComponent = z.infer<typeof valueComponentSchema>;
 export type ServiceStatus = z.infer<typeof serviceStatusSchema>;
-export type BrokerForm = { importerTaxId: string; processingPort: string; entryPort: string; suretyCode: string; entryType: string; locationOfGoods: string };
+export type BrokerLineEvidence = { manufacturerId: { value: string; approved: boolean }; countryOfExport: { value: string; approved: boolean } };
+export type BrokerForm = { importerTaxId: string; processingPort: string; entryPort: string; suretyCode: string; entryType: string; locationOfGoods: string; lineEvidence: Record<string, BrokerLineEvidence> };
 export type WorkspaceDocument = { id: string; name: string; type: string; size: number; file: File };
 export type ProcessingStage = 'idle' | 'uploaded' | 'extracting' | 'reconciling' | 'generating' | 'validating' | 'completed' | 'error';
 

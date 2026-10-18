@@ -42,7 +42,9 @@ test("sample shipment: values, totals and XML content", async () => {
   assert.equal(r.totals.entered, 22899);
   assert.match(r.xml, /<invoice-no>HLAS-BP-26-0912<\/invoice-no>/);
   assert.match(r.xml, /<country-origin>BD<\/country-origin>/);
-  assert.match(r.xml, /<manufacturer-id>BDEXAGAR41GAZ<\/manufacturer-id>/);
+  assert.doesNotMatch(r.xml, /<manufacturer-id>/, "manufacturer IDs are not manufactured from address data");
+  assert.ok(r.missing.some((m) => m.field === "manufacturer-id for BP-P118S" && m.blocking));
+  assert.ok(r.missing.some((m) => m.field === "country-export for BP-P118S" && m.blocking));
   assert.match(r.xml, /<unlading-port>3002<\/unlading-port>/);
   assert.match(r.xml, /<container-number>OPLU1041723<\/container-number>/);
   assert.doesNotMatch(r.xml, /27270/, "CIF total must not be the entered value");
@@ -75,6 +77,26 @@ test("validator is real: wrong element order / bad port / missing required eleme
 test("MID construction (19 CFR Part 102 Appendix)", () => {
   assert.equal(buildMid({ name: "Mekong Garment JSC", address1: "Lot C7-C8, Road No. 9", city: "Di An", country: "VN" }).mid, "VNMEKGAR9DIA");
   assert.equal(buildMid({ name: "Acme Textile Co", address1: "1234 Main St", city: "Dhaka", country: "Bangladesh" }).mid, "BDACMTEX1234DHA");
+});
+
+test("manufacturer IDs and country of export require line-specific evidence", async () => {
+  const s = sample();
+  // Complete-looking manufacturer details are not a verified manufacturer ID.
+  delete s.invoice.lines[0].manufacturerId;
+  // The Bangladesh-origin sample shares a Vietnam loading port but has no export-country evidence.
+  delete s.invoice.lines[4].exportCountry;
+  const r = await processShipment(s, {}, TODAY);
+  assert.doesNotMatch(r.xml, /<manufacturer-id>/);
+  assert.ok(r.missing.some((m) => m.field === "manufacturer-id for BP-T101" && m.blocking));
+  assert.ok(r.missing.some((m) => m.field === "country-export for BP-P118S" && m.blocking));
+  assert.doesNotMatch(r.xml, /<country-origin>BD<\/country-origin>[\s\S]*?<country-export>VN<\/country-export>/);
+
+  s.invoice.lines[4].manufacturerId = "BDSOURCE123";
+  s.invoice.lines[4].exportCountry = "BD";
+  const sourced = await processShipment(s, {}, TODAY);
+  assert.match(sourced.xml, /<manufacturer-id>BDSOURCE123<\/manufacturer-id>/);
+  assert.match(sourced.xml, /<country-origin>BD<\/country-origin>[\s\S]*?<country-export>BD<\/country-export>/);
+  assert.ok(sourced.assumptions.some((a) => a.field === "manufacturer-id BP-P118S" && a.status === "verified"));
 });
 
 test("date disambiguation uses the B/L date", () => {

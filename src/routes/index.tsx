@@ -31,12 +31,18 @@ const summaryFields = [
   ['origin', 'Country of origin'], ['destination', 'Destination port'], ['invoiceValue', 'Invoice value · CIF (USD)'],
   ['freight', 'Freight (USD)'], ['insurance', 'Insurance (USD)'], ['packages', 'Packages (cartons)'], ['grossWeight', 'Gross weight (kg)'],
 ] as const;
-const emptyBroker: BrokerForm = { importerTaxId: '', processingPort: '', entryPort: '', suretyCode: '', entryType: '', locationOfGoods: '' };
+const emptyBroker: BrokerForm = { importerTaxId: '', processingPort: '', entryPort: '', suretyCode: '', entryType: '', locationOfGoods: '', lineEvidence: {} };
 
 /** Broker inputs plus explicit per-component approvals, in the shape the backend validates. Empty fields are omitted, never defaulted. */
 function brokerPayload(form: BrokerForm, approved?: Record<string, boolean>): BrokerPayload {
   const out: Record<string, unknown> = {};
-  (Object.keys(form) as (keyof BrokerForm)[]).forEach(key => { const value = form[key].trim(); if (value) out[key] = value; });
+  (['importerTaxId', 'processingPort', 'entryPort', 'suretyCode', 'entryType', 'locationOfGoods'] as const).forEach(key => { const value = form[key].trim(); if (value) out[key] = value; });
+  const lineEvidence = Object.fromEntries(Object.entries(form.lineEvidence).flatMap(([id, evidence]) => {
+    const manufacturerId = evidence.manufacturerId.value.trim(); const countryOfExport = evidence.countryOfExport.value.trim();
+    const value = { ...(manufacturerId ? { manufacturerId: { value: manufacturerId, approved: evidence.manufacturerId.approved } } : {}), ...(countryOfExport ? { countryOfExport: { value: countryOfExport, approved: evidence.countryOfExport.approved } } : {}) };
+    return Object.keys(value).length ? [[id, value]] : [];
+  }));
+  if (Object.keys(lineEvidence).length) out['lineEvidence'] = lineEvidence;
   if (approved) {
     const styles = (id: string) => Object.entries(approved).filter(([key, on]) => on && key.endsWith(`:${id}`)).map(([key]) => key.slice(0, key.length - id.length - 1));
     const corrections = styles('recomputed-delta'), assists = styles('assist');
@@ -99,7 +105,7 @@ function Index() {
     if (!entry?.source || !shipment) { setError('Process the documents first; there is no extraction to regenerate from.'); return; }
     const abort = new AbortController(); controller.current = abort; setStage('generating');
     try {
-      const result = await regenerateEntry({ source: entry.source, shipment, broker: brokerPayload(broker, approved) }, abort.signal);
+      const result = await regenerateEntry({ source: entry.source, ...(entry.sourceProof ? { sourceProof: entry.sourceProof } : {}), shipment, broker: brokerPayload(broker, approved) }, abort.signal);
       if (abort.signal.aborted) return;
       setShipment(result.shipment); setEntry(result); setStale(false); setReviewContinued(true); setStage('completed');
       addActivity(`XML regenerated. ${result.edits?.length ?? 0} broker edit(s) recorded; extracted source values preserved.`);
@@ -133,7 +139,7 @@ function Index() {
       <div className="workflow-content">
         <div className="documents-step" ref={docsRef}><PdfUpload documents={documents} stage={stage} error={error} onFiles={addFiles} onRemove={id => { setDocuments(current => current.filter(doc => doc.id !== id)); setDocumentsChanged(true); if (entry) { markReviewChanged(); setStage('uploaded'); } addActivity('PDF document removed.'); }} onProcess={process} onCancel={cancel}/></div>
         {shipment && <><section className="overview-step" aria-label="Shipment overview"><span className="eyebrow overview-step-label">STEP 2 · EXTRACTED DATA</span><div ref={overviewRef}><ShipmentSummary shipment={shipment} onEdit={openEdit}/></div><div ref={linesRef}><LineItemTable lines={shipment.lines} editing={editingLines} onEditing={setEditingLines} onChange={editLine} onAdd={() => { setShipment(current => current ? {...current,lines:[...current.lines,{id:crypto.randomUUID(),description:'',hsCode:'',quantity:0,unitPrice:null,amount:null,origin:''}]} : null); markReviewChanged(); }} onRemove={id => { setShipment(current => current ? {...current,lines:current.lines.filter(line => line.id !== id)} : null); markReviewChanged(); }}/></div></section>
-          {entry && <div ref={brokerRef}><ReconciliationFindings findings={findings} onAction={handleFinding}><ValuationPanel entry={entry} approved={approved} onApprove={(key, value) => { setApproved(current => ({...current,[key]:value})); markReviewChanged(); }} broker={broker} onBroker={(key, value) => { setBroker(current => ({...current,[key]:value})); markReviewChanged(); }} disabled={busy}/><div className="review-continue"><p>Resolve or note any open items before continuing. Remaining blockers stay visible in the draft.</p><Button onClick={regenerate} disabled={busy || !entry.source}>{busy ? 'Updating XML…' : 'Continue to XML'}<ArrowRight/></Button></div></ReconciliationFindings></div>}
+          {entry && <div ref={brokerRef}><ReconciliationFindings findings={findings} onAction={handleFinding}><ValuationPanel entry={entry} approved={approved} onApprove={(key, value) => { setApproved(current => ({...current,[key]:value})); markReviewChanged(); }} broker={broker} onBroker={(key, value) => { setBroker(current => ({...current,[key]:value})); markReviewChanged(); }} onLineEvidence={(lineId, field, value) => { setBroker(current => { const prior = current.lineEvidence[lineId] ?? { manufacturerId: { value: '', approved: false }, countryOfExport: { value: '', approved: false } }; const next = typeof value === 'boolean' ? { ...prior, [field]: { ...prior[field], approved: value } } : { ...prior, [field]: { value, approved: false } }; return { ...current, lineEvidence: { ...current.lineEvidence, [lineId]: next } }; }); markReviewChanged(); }} disabled={busy}/><div className="review-continue"><p>Resolve or note any open items before continuing. Remaining blockers stay visible in the draft.</p><Button onClick={regenerate} disabled={busy || !entry.source}>{busy ? 'Updating XML…' : 'Continue to XML'}<ArrowRight/></Button></div></ReconciliationFindings></div>}
           <div ref={xmlRef}><XmlViewer entry={entry} stale={stale} busy={busy} onGenerate={regenerate}/></div>
         </>}
       </div>

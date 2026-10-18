@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Illustrative draft regenerated from current backend behavior; unresolved manufacturer IDs and country-of-export values are intentionally omitted. -->
 <entry xmlns="http://www.netchb.com/xml/entry">
+  <!-- DRAFT ENTRY SUMMARY ONLY - NOT FOR OFFICIAL CBP/NETCHB SUBMISSION WITHOUT LICENSED BROKER REVIEW AND COMPLETED FIELDS -->
   <entry-no><system-generated/></entry-no>
   <external-reference-number>BP-26-0918</external-reference-number>
   <header>
@@ -45,12 +47,10 @@
     <line-item>
       <export-date>2026-09-24</export-date>
       <country-origin>VN</country-origin>
-      <manufacturer-id>VNMEKGAR9DIA</manufacturer-id>
       <tariffs><tariff>
         <tariff-no>610910</tariff-no>
         <value>6480.00</value>
       </tariff></tariffs>
-      <country-export>VN</country-export>
       <lading-port>55224</lading-port>
       <commercial-description>MEN'S CREW NECK SHORT SLEEVE T-SHIRT 100% COTTON KNIT</commercial-description>
       <invoice-quantity>2400</invoice-quantity>
@@ -59,12 +59,10 @@
     <line-item>
       <export-date>2026-09-24</export-date>
       <country-origin>VN</country-origin>
-      <manufacturer-id>VNMEKGAR9DIA</manufacturer-id>
       <tariffs><tariff>
         <tariff-no>611020</tariff-no>
         <value>8880.00</value>
       </tariff></tariffs>
-      <country-export>VN</country-export>
       <lading-port>55224</lading-port>
       <commercial-description>WOMEN'S PULLOVER HOODIE 60/40 COTTON/POLYESTER FLEECE KNIT</commercial-description>
       <invoice-quantity>1200</invoice-quantity>
@@ -73,12 +71,10 @@
     <line-item>
       <export-date>2026-09-24</export-date>
       <country-origin>VN</country-origin>
-      <manufacturer-id>VNMEKGAR9DIA</manufacturer-id>
       <tariffs><tariff>
         <tariff-no>620342</tariff-no>
         <value>6255.00</value>
       </tariff></tariffs>
-      <country-export>VN</country-export>
       <lading-port>55224</lading-port>
       <commercial-description>MEN'S SLIM FIT CHINO TROUSERS 98/2 COTTON/ELASTANE WOVEN</commercial-description>
       <invoice-quantity>900</invoice-quantity>
@@ -87,12 +83,10 @@
     <line-item>
       <export-date>2026-09-24</export-date>
       <country-origin>VN</country-origin>
-      <manufacturer-id>VNMEKGAR9DIA</manufacturer-id>
       <tariffs><tariff>
         <tariff-no>620640</tariff-no>
         <value>1260.00</value>
       </tariff></tariffs>
-      <country-export>VN</country-export>
       <lading-port>55224</lading-port>
       <commercial-description>WOMEN'S LONG SLEEVE V-NECK BLOUSE 100% POLYESTER WOVEN (CMT)</commercial-description>
       <invoice-quantity>600</invoice-quantity>
@@ -101,12 +95,10 @@
     <line-item>
       <export-date>2026-09-24</export-date>
       <country-origin>BD</country-origin>
-      <manufacturer-id>BDEXAGAR41GAZ</manufacturer-id>
       <tariffs><tariff>
         <tariff-no>610610</tariff-no>
         <value>24.00</value>
       </tariff></tariffs>
-      <country-export>VN</country-export>
       <lading-port>55224</lading-port>
       <commercial-description>WOMEN'S SHORT SLEEVE POLO SHIRT 100% COTTON KNIT FOC SAMPLES</commercial-description>
       <invoice-quantity>24</invoice-quantity>

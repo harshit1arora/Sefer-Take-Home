@@ -49,7 +49,7 @@ const SCHEMA_HINT = `Return ONLY one JSON object (no markdown, no commentary) ma
  "statedTotal":num? (printed CIF/grand total),"statedFobTotal":num? (printed FOB/goods total),"statedSubtotalCarriedForward":num?,
  "seller":Party,"buyer":Party,"shipTo":Party?,"po":str?,"portOfLoading":str?,"portOfDischarge":str?,
  "lines":[{"lineNo":int,"style":str,"description":str,"hts":str?,"quantity":num,"unit":str,"unitPrice":num,"statedAmount":num,
-  "originCountry":"ISO-2"?,"isFreeOfCharge":bool,"customsValue":num?,"assistValue":num?,"manufacturer":Party?}]},
+  "originCountry":"ISO-2"?,"exportCountry":"ISO-2"?,"isFreeOfCharge":bool,"customsValue":num?,"assistValue":num?,"manufacturer":Party?,"manufacturerId":str?}]},
  "packing":{"number":str?,"cartons":int,"grossKg":num,"netKg":num?,"cbm":num?,"lines":[{"style":str,"pcs":int}]},
  "bol":{"houseBill":str,"masterBill":str?,"houseScac":str?,"masterScac":str?,"vessel":str?,"voyage":str?,"portOfLoading":str?,
   "portOfDischarge":str?,"onBoardDate":"YYYY-MM-DD"?,"etaDate":"YYYY-MM-DD"?,"goodsDescription":str?,
@@ -68,6 +68,11 @@ Party={"name":str,"address1":str?,"city":str?,"state":str?,"zip":str?,"country":
   line (a "Made in" mark, a country-of-origin column, or a per-line origin note). If no document establishes it, OMIT the
   field: never infer an origin, never copy one line's origin to another, and never use the port of loading, the shipper's
   country or a default. An omitted origin is the correct answer when the documents are silent.
+- exportCountry is OPTIONAL and distinct from originCountry. Set it only when the documents establish the country of
+  export for that specific line. Never copy originCountry into it, and never apply a shipment-level loading port to a
+  line with a different origin without line-specific evidence.
+- manufacturerId is OPTIONAL. Set it only when the identifier itself is printed in the documents. Do not construct it
+  from a manufacturer name, address, city, or country; omit it when the identifier is not explicitly supported.
 - For free-of-charge lines (marked FOC / No Commercial Value / Free of Charge / Sample): set isFreeOfCharge=true.
   Preserve the printed commercial line amount in statedAmount (if a line prints 0, extract 0; if a line prints 24.00 or (24.00), extract 24.00).
   Place any separately printed total customs-purpose value in customsValue (e.g. if an invoice states "Value for customs purpose only USD 1.00/pc" for 24 pcs, or states a total customs value of 24.00, customsValue is 24.00, representing the total line customs value).

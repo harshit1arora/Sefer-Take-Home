@@ -1,9 +1,9 @@
-import type { BrokerForm, EntryResponse } from '@/features/entry/models';
+import type { BrokerForm, BrokerLineEvidence, EntryResponse } from '@/features/entry/models';
 import { formatMoney } from './ShipmentSummary';
 
 const provenanceLabel = { source: 'SOURCE', derived: 'DERIVED', suggested: 'SUGGESTED', broker_approved: 'BROKER-APPROVED' } as const;
-const statusLabel = { verified: 'verified', derived: 'derived', assumed: 'assumed', broker_confirm: 'broker to confirm', broker_approved: 'broker-approved' } as const;
-const brokerFields: { key: keyof BrokerForm; label: string; hint: string }[] = [
+const statusLabel = { verified: 'verified', derived: 'derived', assumed: 'assumed', broker_confirm: 'broker to confirm', broker_approved: 'broker-approved', broker_supplied: 'broker-supplied' } as const;
+const brokerFields: { key: Exclude<keyof BrokerForm, 'lineEvidence'>; label: string; hint: string }[] = [
   { key: 'importerTaxId', label: 'Importer of record tax ID', hint: 'e.g. 12-3456789' },
   { key: 'processingPort', label: 'Processing port (4 digits)', hint: 'Broker’s Schedule D code' },
   { key: 'entryPort', label: 'Entry port (4 digits)', hint: 'Blank = discharge port, assumed' },
@@ -13,9 +13,10 @@ const brokerFields: { key: keyof BrokerForm; label: string; hint: string }[] = [
 ];
 
 /** Approvals are per component and explicit. Nothing suggested enters the entered value until it is ticked and the XML regenerated. */
-export function ValuationPanel({ entry, approved, onApprove, broker, onBroker, disabled }: {
+export function ValuationPanel({ entry, approved, onApprove, broker, onBroker, onLineEvidence, disabled }: {
   entry: EntryResponse; approved: Record<string, boolean>; onApprove: (key: string, value: boolean) => void;
-  broker: BrokerForm; onBroker: (key: keyof BrokerForm, value: string) => void; disabled: boolean;
+  broker: BrokerForm; onBroker: (key: Exclude<keyof BrokerForm, 'lineEvidence'>, value: string) => void;
+  onLineEvidence: (lineId: string, field: keyof BrokerLineEvidence, value: string | boolean) => void; disabled: boolean;
 }) {
   const v = entry.valuation;
   return <section className="valuation-section" aria-labelledby="valuation-heading" id="valuation-section">
@@ -36,6 +37,13 @@ export function ValuationPanel({ entry, approved, onApprove, broker, onBroker, d
     <div id="broker-inputs"><h3 className="eyebrow">BROKER INPUTS (NOT ON THE DOCUMENTS)</h3>
       <div className="form-grid">{brokerFields.map(f => <label className="form-field" key={f.key}>{f.label}<input value={broker[f.key]} placeholder={f.hint} disabled={disabled} maxLength={40} onChange={event => onBroker(f.key, event.target.value)}/></label>)}</div>
       <p className="valuation-intro">Values are used as typed and checked only by the XSD. HTSUS numbers are entered per line in the invoice-line table. Nothing here is inferred.</p></div>
+    <div className="valuation-lines"><h3 className="eyebrow">LINE EVIDENCE (BROKER SUPPLIED)</h3>{entry.shipment.lines.map(line => {
+      const evidence = broker.lineEvidence[line.id] ?? { manufacturerId: { value: '', approved: false }, countryOfExport: { value: '', approved: false } };
+      return <div className="valuation-line" key={line.id}><div className="valuation-line-head"><strong>{line.style ?? line.id}</strong><span>Origin: {line.origin || 'not stated'}</span></div><div className="form-grid">
+        <label className="form-field">Manufacturer ID<input value={evidence.manufacturerId.value} placeholder="Source or broker record" disabled={disabled} maxLength={30} onChange={event => onLineEvidence(line.id, 'manufacturerId', event.target.value)}/><span className="approve-row"><input type="checkbox" checked={evidence.manufacturerId.approved} disabled={disabled || !evidence.manufacturerId.value.trim()} onChange={event => onLineEvidence(line.id, 'manufacturerId', event.target.checked)}/> Broker approves this ID</span></label>
+        <label className="form-field">Country of export<input value={evidence.countryOfExport.value} placeholder="ISO-2, e.g. BD" disabled={disabled} maxLength={2} onChange={event => onLineEvidence(line.id, 'countryOfExport', event.target.value)}/><span className="approve-row"><input type="checkbox" checked={evidence.countryOfExport.approved} disabled={disabled || !evidence.countryOfExport.value.trim()} onChange={event => onLineEvidence(line.id, 'countryOfExport', event.target.checked)}/> Broker approves this country</span></label>
+      </div></div>;
+    })}</div>
     {entry.assumptions && entry.assumptions.length > 0 && <details className="assumption-list"><summary>Assumptions and derived values ({entry.assumptions.length})</summary>
       <ul>{entry.assumptions.map((a, i) => <li key={`${a.field}-${i}`}><strong>{a.field}</strong> = {a.value} <span className="muted">[{statusLabel[a.status]}]</span><br/><small>{a.basis}</small></li>)}</ul></details>}
   </section>;

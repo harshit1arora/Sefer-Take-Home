@@ -16,7 +16,7 @@
     "isDemo": false,
     "lines": [
       {
-        "id": "line-1",
+        "id": "L1",
         "style": "BP-T101",
         "description": "MEN'S CREW NECK SHORT SLEEVE T-SHIRT 100% COTTON KNIT",
         "hsCode": "6109.10",
@@ -28,7 +28,7 @@
         "freeOfCharge": false
       },
       {
-        "id": "line-2",
+        "id": "L2",
         "style": "BP-H205",
         "description": "WOMEN'S PULLOVER HOODIE 60/40 COTTON/POLYESTER FLEECE KNIT",
         "hsCode": "6110.20",
@@ -40,7 +40,7 @@
         "freeOfCharge": false
       },
       {
-        "id": "line-3",
+        "id": "L3",
         "style": "BP-C330",
         "description": "MEN'S SLIM FIT CHINO TROUSERS 98/2 COTTON/ELASTANE WOVEN",
         "hsCode": "6203.42",
@@ -52,7 +52,7 @@
         "freeOfCharge": false
       },
       {
-        "id": "line-4",
+        "id": "L4",
         "style": "W-B220",
         "description": "WOMEN'S LONG SLEEVE V-NECK BLOUSE 100% POLYESTER WOVEN (CMT)",
         "hsCode": "6206.40",
@@ -64,7 +64,7 @@
         "freeOfCharge": false
       },
       {
-        "id": "line-5",
+        "id": "L5",
         "style": "BP-P118S",
         "description": "WOMEN'S SHORT SLEEVE POLO SHIRT 100% COTTON KNIT FOC SAMPLES",
         "hsCode": "6106.10",
@@ -224,7 +224,7 @@
       "id": "f19",
       "severity": "missing",
       "title": "Not on the documents: ultimate-consignee",
-      "description": "Importer (Bluepeak) vs 3PL ship-to (Cascade) is a broker decision; element omitted.",
+      "description": "The importer vs the 3PL ship-to consignee is a broker decision; the element is omitted.",
       "action": "Add broker details",
       "target": "broker"
     },
@@ -235,9 +235,89 @@
       "description": "Relationship between seller and buyer not stated.",
       "action": "Add broker details",
       "target": "broker"
+    },
+    {
+      "id": "f21",
+      "severity": "missing",
+      "title": "Missing before filing: manufacturer-id for BP-T101",
+      "description": "No approved manufacturer ID is available. It is omitted rather than constructed from company or location details.",
+      "action": "Add broker details",
+      "target": "broker"
+    },
+    {
+      "id": "f22",
+      "severity": "missing",
+      "title": "Missing before filing: country-export for BP-T101",
+      "description": "No approved line-specific country-of-export evidence is available.",
+      "action": "Add broker details",
+      "target": "broker"
+    },
+    {
+      "id": "f23",
+      "severity": "missing",
+      "title": "Missing before filing: manufacturer-id for BP-H205",
+      "description": "No approved manufacturer ID is available. It is omitted rather than constructed from company or location details.",
+      "action": "Add broker details",
+      "target": "broker"
+    },
+    {
+      "id": "f24",
+      "severity": "missing",
+      "title": "Missing before filing: country-export for BP-H205",
+      "description": "No approved line-specific country-of-export evidence is available.",
+      "action": "Add broker details",
+      "target": "broker"
+    },
+    {
+      "id": "f25",
+      "severity": "missing",
+      "title": "Missing before filing: manufacturer-id for BP-C330",
+      "description": "No approved manufacturer ID is available. It is omitted rather than constructed from company or location details.",
+      "action": "Add broker details",
+      "target": "broker"
+    },
+    {
+      "id": "f26",
+      "severity": "missing",
+      "title": "Missing before filing: country-export for BP-C330",
+      "description": "No approved line-specific country-of-export evidence is available.",
+      "action": "Add broker details",
+      "target": "broker"
+    },
+    {
+      "id": "f27",
+      "severity": "missing",
+      "title": "Missing before filing: manufacturer-id for W-B220",
+      "description": "No approved manufacturer ID is available. It is omitted rather than constructed from company or location details.",
+      "action": "Add broker details",
+      "target": "broker"
+    },
+    {
+      "id": "f28",
+      "severity": "missing",
+      "title": "Missing before filing: country-export for W-B220",
+      "description": "No approved line-specific country-of-export evidence is available.",
+      "action": "Add broker details",
+      "target": "broker"
+    },
+    {
+      "id": "f29",
+      "severity": "missing",
+      "title": "Missing before filing: manufacturer-id for BP-P118S",
+      "description": "No approved manufacturer ID is available. It is omitted rather than constructed from company or location details.",
+      "action": "Add broker details",
+      "target": "broker"
+    },
+    {
+      "id": "f30",
+      "severity": "missing",
+      "title": "Missing before filing: country-export for BP-P118S",
+      "description": "No approved line-specific country-of-export evidence is available.",
+      "action": "Add broker details",
+      "target": "broker"
     }
   ],
-  "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<entry xmlns=\"http://www.netchb.com/xml/entry\">\n  <entry-no><system-generated/></entry-no>\n  <external-reference-number>BP-26-0918</external-reference-number>\n  <header>\n    <!-- importer-tax-id missing: broker input required -->\n    <importer-name>Bluepeak Outfitters, Inc.</importer-name>\n    <!-- processing-port is a 0000 SENTINEL: replace before upload -->\n    <processing-port>0000</processing-port>\n    <entry-port>3002</entry-port>\n    <entry-date>2026-10-09</entry-date>\n    <entry-type>01</entry-type>\n    <charges>4035</charges>\n    <gross-weight>1930</gross-weight>\n    <total-entry-value>22899</total-entry-value>\n    <description>WEARING APPAREL</description>\n    <state-destination>WA</state-destination>\n    <vessel-name>PACIFIC ARGOS</vessel-name>\n    <mode-transportation>11</mode-transportation>\n    <unlading-port>3002</unlading-port>\n    <arrival-date>2026-10-14</arrival-date>\n    <carrier-code>OPLU</carrier-code>\n    <customer-reference-no>BP-26-0918</customer-reference-no>\n    <voyage-no>041E</voyage-no>\n  </header>\n  <manifest>\n    <bill-of-lading>\n      <master-scac>OPLU</master-scac><master-bill>SGN26090001</master-bill>\n      <house-scac>BMLV</house-scac><house-bill>HCM26090001</house-bill>\n      <quantity>138</quantity><unit>CTN</unit>\n    </bill-of-lading>\n  </manifest>\n  <containers>\n    <container>\n      <container-number>OPLU1041723</container-number>\n      <container-size>20 ft</container-size>\n      <container-type>Dry</container-type>\n      <seal-numbers>EXL7731482</seal-numbers>\n    </container>\n  </containers>\n  <invoices>\n    <invoice>\n      <invoice-no>HLAS-BP-26-0912</invoice-no>\n      <line-items>\n    <line-item>\n      <export-date>2026-09-24</export-date>\n      <country-origin>VN</country-origin>\n      <manufacturer-id>VNMEKGAR9DIA</manufacturer-id>\n      <tariffs><tariff>\n        <tariff-no>610910</tariff-no>\n        <value>6480.00</value>\n      </tariff></tariffs>\n      <country-export>VN</country-export>\n      <lading-port>55224</lading-port>\n      <commercial-description>MEN'S CREW NECK SHORT SLEEVE T-SHIRT 100% COTTON KNIT</commercial-description>\n      <invoice-quantity>2400</invoice-quantity>\n      <po-number>BP-26-0918</po-number>\n    </line-item>\n    <line-item>\n      <export-date>2026-09-24</export-date>\n      <country-origin>VN</country-origin>\n      <manufacturer-id>VNMEKGAR9DIA</manufacturer-id>\n      <tariffs><tariff>\n        <tariff-no>611020</tariff-no>\n        <value>8880.00</value>\n      </tariff></tariffs>\n      <country-export>VN</country-export>\n      <lading-port>55224</lading-port>\n      <commercial-description>WOMEN'S PULLOVER HOODIE 60/40 COTTON/POLYESTER FLEECE KNIT</commercial-description>\n      <invoice-quantity>1200</invoice-quantity>\n      <po-number>BP-26-0918</po-number>\n    </line-item>\n    <line-item>\n      <export-date>2026-09-24</export-date>\n      <country-origin>VN</country-origin>\n      <manufacturer-id>VNMEKGAR9DIA</manufacturer-id>\n      <tariffs><tariff>\n        <tariff-no>620342</tariff-no>\n        <value>6255.00</value>\n      </tariff></tariffs>\n      <country-export>VN</country-export>\n      <lading-port>55224</lading-port>\n      <commercial-description>MEN'S SLIM FIT CHINO TROUSERS 98/2 COTTON/ELASTANE WOVEN</commercial-description>\n      <invoice-quantity>900</invoice-quantity>\n      <po-number>BP-26-0918</po-number>\n    </line-item>\n    <line-item>\n      <export-date>2026-09-24</export-date>\n      <country-origin>VN</country-origin>\n      <manufacturer-id>VNMEKGAR9DIA</manufacturer-id>\n      <tariffs><tariff>\n        <tariff-no>620640</tariff-no>\n        <value>1260.00</value>\n      </tariff></tariffs>\n      <country-export>VN</country-export>\n      <lading-port>55224</lading-port>\n      <commercial-description>WOMEN'S LONG SLEEVE V-NECK BLOUSE 100% POLYESTER WOVEN (CMT)</commercial-description>\n      <invoice-quantity>600</invoice-quantity>\n      <po-number>BP-26-0918</po-number>\n    </line-item>\n    <line-item>\n      <export-date>2026-09-24</export-date>\n      <country-origin>BD</country-origin>\n      <manufacturer-id>BDEXAGAR41GAZ</manufacturer-id>\n      <tariffs><tariff>\n        <tariff-no>610610</tariff-no>\n        <value>24.00</value>\n      </tariff></tariffs>\n      <country-export>VN</country-export>\n      <lading-port>55224</lading-port>\n      <commercial-description>WOMEN'S SHORT SLEEVE POLO SHIRT 100% COTTON KNIT FOC SAMPLES</commercial-description>\n      <invoice-quantity>24</invoice-quantity>\n      <po-number>BP-26-0918</po-number>\n    </line-item>\n      </line-items>\n    </invoice>\n  </invoices>\n</entry>\n",
+  "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<entry xmlns=\"http://www.netchb.com/xml/entry\">\n  <!-- DRAFT ENTRY SUMMARY ONLY - NOT FOR OFFICIAL CBP/NETCHB SUBMISSION WITHOUT LICENSED BROKER REVIEW AND COMPLETED FIELDS -->\n  <entry-no><system-generated/></entry-no>\n  <external-reference-number>BP-26-0918</external-reference-number>\n  <header>\n    <!-- importer-tax-id missing: broker input required -->\n    <importer-name>Bluepeak Outfitters, Inc.</importer-name>\n    <!-- processing-port is a 0000 SENTINEL: replace before upload -->\n    <processing-port>0000</processing-port>\n    <entry-port>3002</entry-port>\n    <entry-date>2026-10-09</entry-date>\n    <entry-type>01</entry-type>\n    <charges>4035</charges>\n    <gross-weight>1930</gross-weight>\n    <total-entry-value>22899</total-entry-value>\n    <description>WEARING APPAREL</description>\n    <state-destination>WA</state-destination>\n    <vessel-name>PACIFIC ARGOS</vessel-name>\n    <mode-transportation>11</mode-transportation>\n    <unlading-port>3002</unlading-port>\n    <arrival-date>2026-10-14</arrival-date>\n    <carrier-code>OPLU</carrier-code>\n    <customer-reference-no>BP-26-0918</customer-reference-no>\n    <voyage-no>041E</voyage-no>\n  </header>\n  <manifest>\n    <bill-of-lading>\n      <master-scac>OPLU</master-scac><master-bill>SGN26090001</master-bill>\n      <house-scac>BMLV</house-scac><house-bill>HCM26090001</house-bill>\n      <quantity>138</quantity><unit>CTN</unit>\n    </bill-of-lading>\n  </manifest>\n  <containers>\n    <container>\n      <container-number>OPLU1041723</container-number>\n      <container-size>20 ft</container-size>\n      <container-type>Dry</container-type>\n      <seal-numbers>EXL7731482</seal-numbers>\n    </container>\n  </containers>\n  <invoices>\n    <invoice>\n      <invoice-no>HLAS-BP-26-0912</invoice-no>\n      <line-items>\n    <line-item>\n      <export-date>2026-09-24</export-date>\n      <country-origin>VN</country-origin>\n      <tariffs><tariff>\n        <tariff-no>610910</tariff-no>\n        <value>6480.00</value>\n      </tariff></tariffs>\n      <lading-port>55224</lading-port>\n      <commercial-description>MEN'S CREW NECK SHORT SLEEVE T-SHIRT 100% COTTON KNIT</commercial-description>\n      <invoice-quantity>2400</invoice-quantity>\n      <po-number>BP-26-0918</po-number>\n    </line-item>\n    <line-item>\n      <export-date>2026-09-24</export-date>\n      <country-origin>VN</country-origin>\n      <tariffs><tariff>\n        <tariff-no>611020</tariff-no>\n        <value>8880.00</value>\n      </tariff></tariffs>\n      <lading-port>55224</lading-port>\n      <commercial-description>WOMEN'S PULLOVER HOODIE 60/40 COTTON/POLYESTER FLEECE KNIT</commercial-description>\n      <invoice-quantity>1200</invoice-quantity>\n      <po-number>BP-26-0918</po-number>\n    </line-item>\n    <line-item>\n      <export-date>2026-09-24</export-date>\n      <country-origin>VN</country-origin>\n      <tariffs><tariff>\n        <tariff-no>620342</tariff-no>\n        <value>6255.00</value>\n      </tariff></tariffs>\n      <lading-port>55224</lading-port>\n      <commercial-description>MEN'S SLIM FIT CHINO TROUSERS 98/2 COTTON/ELASTANE WOVEN</commercial-description>\n      <invoice-quantity>900</invoice-quantity>\n      <po-number>BP-26-0918</po-number>\n    </line-item>\n    <line-item>\n      <export-date>2026-09-24</export-date>\n      <country-origin>VN</country-origin>\n      <tariffs><tariff>\n        <tariff-no>620640</tariff-no>\n        <value>1260.00</value>\n      </tariff></tariffs>\n      <lading-port>55224</lading-port>\n      <commercial-description>WOMEN'S LONG SLEEVE V-NECK BLOUSE 100% POLYESTER WOVEN (CMT)</commercial-description>\n      <invoice-quantity>600</invoice-quantity>\n      <po-number>BP-26-0918</po-number>\n    </line-item>\n    <line-item>\n      <export-date>2026-09-24</export-date>\n      <country-origin>BD</country-origin>\n      <tariffs><tariff>\n        <tariff-no>610610</tariff-no>\n        <value>24.00</value>\n      </tariff></tariffs>\n      <lading-port>55224</lading-port>\n      <commercial-description>WOMEN'S SHORT SLEEVE POLO SHIRT 100% COTTON KNIT FOC SAMPLES</commercial-description>\n      <invoice-quantity>24</invoice-quantity>\n      <po-number>BP-26-0918</po-number>\n    </line-item>\n      </line-items>\n    </invoice>\n  </invoices>\n</entry>\n",
   "validation": {
     "syntax": {
       "status": "passed",
@@ -301,7 +381,8 @@
           "unitPrice": 2.85,
           "statedAmount": 6480,
           "originCountry": "VN",
-          "isFreeOfCharge": false
+          "isFreeOfCharge": false,
+          "id": "L1"
         },
         {
           "lineNo": 2,
@@ -313,7 +394,8 @@
           "unitPrice": 7.4,
           "statedAmount": 8880,
           "originCountry": "VN",
-          "isFreeOfCharge": false
+          "isFreeOfCharge": false,
+          "id": "L2"
         },
         {
           "lineNo": 3,
@@ -325,7 +407,8 @@
           "unitPrice": 6.95,
           "statedAmount": 6255,
           "originCountry": "VN",
-          "isFreeOfCharge": false
+          "isFreeOfCharge": false,
+          "id": "L3"
         },
         {
           "lineNo": 4,
@@ -338,7 +421,8 @@
           "statedAmount": 1260,
           "originCountry": "VN",
           "isFreeOfCharge": false,
-          "assistValue": 4180
+          "assistValue": 4180,
+          "id": "L4"
         },
         {
           "lineNo": 5,
@@ -357,7 +441,8 @@
             "address1": "Plot 41, Example Industrial Estate",
             "city": "Gazipur",
             "country": "BD"
-          }
+          },
+          "id": "L5"
         }
       ],
       "statedFobTotal": 23235,
@@ -427,9 +512,11 @@
       "The B/L container number was corrected by hand; verify the final digits against the carrier's record."
     ]
   },
+  "sourceProof": "52ad1c13fa9d5f86f964a546000db83de498ac5dc459c4531a6ddb8bc49e853f",
   "valuation": {
     "lines": [
       {
+        "id": "L1",
         "lineNo": 1,
         "style": "BP-T101",
         "components": [
@@ -454,6 +541,7 @@
         "valueIfAllSuggestionsAccepted": 6840
       },
       {
+        "id": "L2",
         "lineNo": 2,
         "style": "BP-H205",
         "components": [
@@ -470,6 +558,7 @@
         "valueIfAllSuggestionsAccepted": 8880
       },
       {
+        "id": "L3",
         "lineNo": 3,
         "style": "BP-C330",
         "components": [
@@ -486,6 +575,7 @@
         "valueIfAllSuggestionsAccepted": 6255
       },
       {
+        "id": "L4",
         "lineNo": 4,
         "style": "W-B220",
         "components": [
@@ -510,6 +600,7 @@
         "valueIfAllSuggestionsAccepted": 5440
       },
       {
+        "id": "L5",
         "lineNo": 5,
         "style": "BP-P118S",
         "components": [
@@ -548,7 +639,7 @@
       "field": "entry-port",
       "value": "3002",
       "status": "assumed",
-      "basis": "Assumed entry at port of discharge. CBP CSMS 15-000496 and FDA port list: Tacoma, WA = 3002. The B/L routes goods by truck/ramp to Kent, WA; confirm no in-bond movement."
+      "basis": "Assumed entry at the port of discharge. CBP CSMS 15-000496 and FDA port list: Tacoma, WA = 3002. Confirm the goods did not move in-bond before entry."
     },
     {
       "field": "unlading-port",
@@ -578,13 +669,13 @@
       "field": "carrier-code",
       "value": "OPLU",
       "status": "derived",
-      "basis": "SCAC of the ocean carrier named on the B/L (Orient Pacific Lines)."
+      "basis": "SCAC of the ocean carrier named on the B/L."
     },
     {
       "field": "gross-weight",
       "value": "1930",
       "status": "derived",
-      "basis": "B/L declared weight used; packing list shows a lower figure (see findings)."
+      "basis": "Gross weight declared on the B/L (see findings for any cross-document difference)."
     },
     {
       "field": "charges",
@@ -608,13 +699,13 @@
       "field": "master-scac/master-bill",
       "value": "OPLU/SGN26090001",
       "status": "assumed",
-      "basis": "Bill numbers split as SCAC + number (ACE manifest convention, recalled not verified). data_type.xsd billNoType alone would also accept the unsplit string."
+      "basis": "Bill number split as SCAC + number (ACE manifest convention, recalled not verified). data_type.xsd billNoType alone would also accept the unsplit string. Confirm the SCAC against the manifest."
     },
     {
       "field": "house-scac/house-bill",
       "value": "BMLV/HCM26090001",
       "status": "assumed",
-      "basis": "Same SCAC + number split; B/L shows SCAC BMLV."
+      "basis": "Bill number split as SCAC + number; confirm the SCAC against the manifest."
     },
     {
       "field": "invoice-no",
@@ -623,25 +714,19 @@
       "basis": "\"HLAS/BP/26-0912\" violates invoiceNoType pattern [A-Za-z\\d\\-]{1,17}; slashes replaced with hyphens."
     },
     {
-      "field": "country-export",
-      "value": "VN",
-      "status": "assumed",
-      "basis": "Goods shipped from Vietnam; the Bangladesh samples were consolidated at Cat Lai, so Vietnam is assumed as country of export for all lines."
-    },
-    {
       "field": "lading-port",
       "value": "55224",
       "status": "assumed",
-      "basis": "CBP ACE Appendix F lists 55224 = Ho Chi Minh City and 55225 = Tan Cang; Cat Lai is not named, so confirm which one applies"
+      "basis": "CBP ACE Appendix F lists 55224 = Ho Chi Minh City and 55225 = Tan Cang. The exact Schedule D port for the terminal named on the B/L is not resolved; confirm which code applies."
     },
     {
-      "field": "value BP-T101: recomputed-delta",
+      "field": "value L1: recomputed-delta",
       "value": "360.00",
       "status": "broker_confirm",
       "basis": "NOT in the entered value. Proposed correction to quantity x unit price (2400 x 2.85 = 6840.00). Suggested only. Printed amount and quantity x price disagree; see the finding for the evidence. Which figure was actually paid or payable must be confirmed (for example against the payment record)."
     },
     {
-      "field": "value W-B220: assist",
+      "field": "value L4: assist",
       "value": "4180.00",
       "status": "broker_confirm",
       "basis": "NOT in the entered value. Buyer-supplied material (assist). Suggested only. Invoice note states USD 4180.00 of free fabric. Free materials incorporated in the goods are generally assists (19 U.S.C. 1401a(h)(1)(A)); amount and any added costs need broker confirmation. Kept separate from the invoice amount."
@@ -653,40 +738,10 @@
       "basis": "Included as printed. Invoice line 5: \"value for customs purpose only\" (24 x 1). No commercial value; valuation and any 9811.00.60 treatment are broker decisions."
     },
     {
-      "field": "manufacturer-id BP-T101",
-      "value": "VNMEKGAR9DIA",
-      "status": "derived",
-      "basis": "MID derived from name/address (street line has several numbers: 7, 8, 9, 2) per 19 CFR Part 102 Appendix. Broker must confirm against the manufacturer's legal name and address."
-    },
-    {
-      "field": "manufacturer-id BP-H205",
-      "value": "VNMEKGAR9DIA",
-      "status": "derived",
-      "basis": "MID derived from name/address (street line has several numbers: 7, 8, 9, 2) per 19 CFR Part 102 Appendix. Broker must confirm against the manufacturer's legal name and address."
-    },
-    {
-      "field": "manufacturer-id BP-C330",
-      "value": "VNMEKGAR9DIA",
-      "status": "derived",
-      "basis": "MID derived from name/address (street line has several numbers: 7, 8, 9, 2) per 19 CFR Part 102 Appendix. Broker must confirm against the manufacturer's legal name and address."
-    },
-    {
-      "field": "manufacturer-id W-B220",
-      "value": "VNMEKGAR9DIA",
-      "status": "derived",
-      "basis": "MID derived from name/address (street line has several numbers: 7, 8, 9, 2) per 19 CFR Part 102 Appendix. Broker must confirm against the manufacturer's legal name and address."
-    },
-    {
-      "field": "manufacturer-id BP-P118S",
-      "value": "BDEXAGAR41GAZ",
-      "status": "derived",
-      "basis": "MID derived from name/address per 19 CFR Part 102 Appendix. Broker must confirm against the manufacturer's legal name and address."
-    },
-    {
       "field": "container-type",
       "value": "Dry",
       "status": "assumed",
-      "basis": "20' GP (general purpose) mapped to 'Dry'."
+      "basis": "Container size mapped to the entry.xsd enumeration; type assumed 'Dry' (general purpose). Confirm with the carrier."
     }
   ],
   "missing": [
@@ -712,7 +767,7 @@
     },
     {
       "field": "ultimate-consignee",
-      "why": "Importer (Bluepeak) vs 3PL ship-to (Cascade) is a broker decision; element omitted.",
+      "why": "The importer vs the 3PL ship-to consignee is a broker decision; the element is omitted.",
       "blocking": false
     },
     {
@@ -726,8 +781,28 @@
       "blocking": true
     },
     {
+      "field": "manufacturer-id for BP-T101",
+      "why": "No approved manufacturer ID is available. It is omitted rather than constructed from company or location details.",
+      "blocking": true
+    },
+    {
+      "field": "country-export for BP-T101",
+      "why": "No approved line-specific country-of-export evidence is available.",
+      "blocking": true
+    },
+    {
       "field": "HTSUS 10-digit for BP-H205",
       "why": "Only \"6110.20\" is on the documents. The XSD accepts 5-10 digits, so a 6-digit value passes validation but is not a fileable classification.",
+      "blocking": true
+    },
+    {
+      "field": "manufacturer-id for BP-H205",
+      "why": "No approved manufacturer ID is available. It is omitted rather than constructed from company or location details.",
+      "blocking": true
+    },
+    {
+      "field": "country-export for BP-H205",
+      "why": "No approved line-specific country-of-export evidence is available.",
       "blocking": true
     },
     {
@@ -736,23 +811,53 @@
       "blocking": true
     },
     {
+      "field": "manufacturer-id for BP-C330",
+      "why": "No approved manufacturer ID is available. It is omitted rather than constructed from company or location details.",
+      "blocking": true
+    },
+    {
+      "field": "country-export for BP-C330",
+      "why": "No approved line-specific country-of-export evidence is available.",
+      "blocking": true
+    },
+    {
       "field": "HTSUS 10-digit for W-B220",
       "why": "Only \"6206.40\" is on the documents. The XSD accepts 5-10 digits, so a 6-digit value passes validation but is not a fileable classification.",
+      "blocking": true
+    },
+    {
+      "field": "manufacturer-id for W-B220",
+      "why": "No approved manufacturer ID is available. It is omitted rather than constructed from company or location details.",
+      "blocking": true
+    },
+    {
+      "field": "country-export for W-B220",
+      "why": "No approved line-specific country-of-export evidence is available.",
       "blocking": true
     },
     {
       "field": "HTSUS 10-digit for BP-P118S",
       "why": "Only \"6106.10\" is on the documents. The XSD accepts 5-10 digits, so a 6-digit value passes validation but is not a fileable classification.",
       "blocking": true
+    },
+    {
+      "field": "manufacturer-id for BP-P118S",
+      "why": "No approved manufacturer ID is available. It is omitted rather than constructed from company or location details.",
+      "blocking": true
+    },
+    {
+      "field": "country-export for BP-P118S",
+      "why": "No approved line-specific country-of-export evidence is available.",
+      "blocking": true
     }
   ],
   "edits": [],
   "readiness": {
     "readyToFile": false,
-    "note": "NOT ready to file: schema validation (passed) only proves structure. 8 blocking missing input(s), 14 assumption(s) needing confirmation, 2 suggested value change(s) not yet approved, 2 document discrepancy error(s).",
-    "blockingMissing": 8,
-    "unconfirmedAssumptions": 14,
+    "note": "NOT ready to file: the XML only passed a PARTIAL (bundled-subset) schema check, which cannot establish full NetCHB compatibility. 18 blocking missing input(s), 13 assumption(s) needing confirmation, 2 suggested value change(s) not approved, 12 blocking document discrepancy(ies).",
+    "blockingMissing": 18,
+    "unconfirmedAssumptions": 13,
     "pendingSuggestions": 2,
-    "documentErrors": 2
+    "documentErrors": 12
   }
 }

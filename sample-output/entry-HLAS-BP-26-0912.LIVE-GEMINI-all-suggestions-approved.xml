@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Illustrative draft regenerated from current backend behavior; unresolved manufacturer IDs and country-of-export values are intentionally omitted. -->
 <entry xmlns="http://www.netchb.com/xml/entry">
+  <!-- DRAFT ENTRY SUMMARY ONLY - NOT FOR OFFICIAL CBP/NETCHB SUBMISSION WITHOUT LICENSED BROKER REVIEW AND COMPLETED FIELDS -->
   <entry-no><system-generated/></entry-no>
   <external-reference-number>BP-26-0918</external-reference-number>
   <header>
     <!-- importer-tax-id missing: broker input required -->
-    <importer-name>BLUEPEAK OUTFITTERS, INC.</importer-name>
+    <importer-name>Bluepeak Outfitters, Inc.</importer-name>
     <!-- processing-port is a 0000 SENTINEL: replace before upload -->
     <processing-port>0000</processing-port>
     <entry-port>3002</entry-port>
-    <entry-date>2026-10-11</entry-date>
+    <entry-date>2026-10-09</entry-date>
     <entry-type>01</entry-type>
     <charges>4035</charges>
     <gross-weight>1930</gross-weight>
-    <total-entry-value>27439</total-entry-value>
-    <description>138 CARTONS OF WEARING APPAREL - MEN'S AND LADIES' KNIT AND WOVEN GARM</description>
+    <total-entry-value>22899</total-entry-value>
+    <description>WEARING APPAREL</description>
     <state-destination>WA</state-destination>
     <vessel-name>PACIFIC ARGOS</vessel-name>
     <mode-transportation>11</mode-transportation>
     <unlading-port>3002</unlading-port>
+    <arrival-date>2026-10-14</arrival-date>
     <carrier-code>OPLU</carrier-code>
     <customer-reference-no>BP-26-0918</customer-reference-no>
     <voyage-no>041E</voyage-no>
@@ -44,70 +47,60 @@
     <line-item>
       <export-date>2026-09-24</export-date>
       <country-origin>VN</country-origin>
-      <manufacturer-id>VNMEKGAR9DIA</manufacturer-id>
       <tariffs><tariff>
         <tariff-no>610910</tariff-no>
-        <value>6840.00</value>
+        <value>6480.00</value>
       </tariff></tariffs>
-      <country-export>VN</country-export>
       <lading-port>55224</lading-port>
-      <commercial-description>MEN'S CREW NECK SHORT SLEEVE T-SHIRT 100% Cotton single jersey, 160 GSM, knitted Colours: Black / White / Heather Navy Size ratio S-M-L-XL-XXL : 1-3-3-2-1</commercial-description>
+      <commercial-description>MEN'S CREW NECK SHORT SLEEVE T-SHIRT 100% COTTON KNIT</commercial-description>
       <invoice-quantity>2400</invoice-quantity>
       <po-number>BP-26-0918</po-number>
     </line-item>
     <line-item>
       <export-date>2026-09-24</export-date>
       <country-origin>VN</country-origin>
-      <manufacturer-id>VNMEKGAR9DIA</manufacturer-id>
       <tariffs><tariff>
         <tariff-no>611020</tariff-no>
         <value>8880.00</value>
       </tariff></tariffs>
-      <country-export>VN</country-export>
       <lading-port>55224</lading-port>
-      <commercial-description>WOMEN'S PULLOVER HOODIE W/ KANGAROO POCKET 60% Cotton 40% Polyester brushed fleece, 280 GSM, knitted Colours: Oatmeal / Sage Size ratio XS-S-M-L-XL : 1-2-3-3-3</commercial-description>
+      <commercial-description>WOMEN'S PULLOVER HOODIE 60/40 COTTON/POLYESTER FLEECE KNIT</commercial-description>
       <invoice-quantity>1200</invoice-quantity>
       <po-number>BP-26-0918</po-number>
     </line-item>
     <line-item>
       <export-date>2026-09-24</export-date>
       <country-origin>VN</country-origin>
-      <manufacturer-id>VNMEKGAR9DIA</manufacturer-id>
       <tariffs><tariff>
         <tariff-no>620342</tariff-no>
         <value>6255.00</value>
       </tariff></tariffs>
-      <country-export>VN</country-export>
       <lading-port>55224</lading-port>
-      <commercial-description>MEN'S SLIM FIT CHINO TROUSERS 98% Cotton 2% Elastane stretch twill, 245 GSM, woven Colours: Khaki / Olive / Navy Waist 30-32-34-36-38 : 1-2-3-3-1</commercial-description>
+      <commercial-description>MEN'S SLIM FIT CHINO TROUSERS 98/2 COTTON/ELASTANE WOVEN</commercial-description>
       <invoice-quantity>900</invoice-quantity>
       <po-number>BP-26-0918</po-number>
     </line-item>
     <line-item>
       <export-date>2026-09-24</export-date>
       <country-origin>VN</country-origin>
-      <manufacturer-id>VNMEKGAR9DIA</manufacturer-id>
       <tariffs><tariff>
         <tariff-no>620640</tariff-no>
-        <value>5440.00</value>
+        <value>1260.00</value>
       </tariff></tariffs>
-      <country-export>VN</country-export>
       <lading-port>55224</lading-port>
-      <commercial-description>WOMEN'S LONG SLEEVE BLOUSE, V-NECK 100% Polyester crepe de chine, woven Colours: Ivory / Black Size ratio XS-S-M-L-XL : 1-2-3-3-1 CMT price, see note (*)</commercial-description>
+      <commercial-description>WOMEN'S LONG SLEEVE V-NECK BLOUSE 100% POLYESTER WOVEN (CMT)</commercial-description>
       <invoice-quantity>600</invoice-quantity>
       <po-number>BP-26-0918</po-number>
     </line-item>
     <line-item>
       <export-date>2026-09-24</export-date>
       <country-origin>BD</country-origin>
-      <manufacturer-id>BDSAIPHO9DIA</manufacturer-id>
       <tariffs><tariff>
         <tariff-no>610610</tariff-no>
         <value>24.00</value>
       </tariff></tariffs>
-      <country-export>VN</country-export>
       <lading-port>55224</lading-port>
-      <commercial-description>WOMEN'S SHORT SLEEVE POLO SHIRT - SAMPLES 100% Cotton pique, knitted FOC SAMPLES - NO COMMERCIAL VALUE Value for customs purpose only USD 1.00/pc (Origin: Bangladesh)</commercial-description>
+      <commercial-description>WOMEN'S SHORT SLEEVE POLO SHIRT 100% COTTON KNIT FOC SAMPLES</commercial-description>
       <invoice-quantity>24</invoice-quantity>
       <po-number>BP-26-0918</po-number>
     </line-item>

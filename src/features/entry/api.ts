@@ -39,7 +39,7 @@ export async function processEntry(documents: File[], signal?: AbortSignal, brok
 }
 
 /** Rebuilds the XML from the edited shipment. The backend applies edits to the original extraction and records each one. */
-export async function regenerateEntry(args: { source: Record<string, unknown>; shipment: EntryResponse['shipment']; broker?: BrokerPayload }, signal?: AbortSignal): Promise<EntryResponse> {
+export async function regenerateEntry(args: { source: Record<string, unknown>; sourceProof?: string; shipment: EntryResponse['shipment']; broker?: BrokerPayload }, signal?: AbortSignal): Promise<EntryResponse> {
   const response = await send('/api/entry/regenerate', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(args) }, signal);
   return accept(response);
 }

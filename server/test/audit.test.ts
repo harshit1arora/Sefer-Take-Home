@@ -25,7 +25,7 @@ test("country codes: names/aliases normalise, UK -> GB, invalid stays unresolved
 });
 
 // ================= C: no fabricated header values =================
-test("no fabricated header data: missing description and unresolvable country of export are omitted and flagged", async () => {
+test("no fabricated header data: missing description and country-of-export evidence are omitted and flagged", async () => {
   const s = sample();
   delete s.bol.goodsDescription;
   s.bol.portOfLoading = undefined;
@@ -33,15 +33,39 @@ test("no fabricated header data: missing description and unresolvable country of
   assert.doesNotMatch(r.xml, /<description>/, "no defaulted goods description");
   assert.doesNotMatch(r.xml, /<country-export>/, "no defaulted country of export");
   assert.ok(r.missing.some((m) => m.field === "goods description"));
-  assert.ok(r.missing.some((m) => m.field === "country-export"));
+  assert.ok(r.missing.some((m) => m.field.startsWith("country-export for ")));
 });
 
-test("country of export is derived from the port of loading, not copied from a line's origin", async () => {
+test("country of export is emitted only from per-line evidence", async () => {
   const s = sample();
   s.bol.portOfLoading = "SHEKOU, SHENZHEN, CN";
+  s.invoice.lines[0].exportCountry = "CN";
   const r = await processShipment(s, {}, T);
   assert.match(r.xml, /<country-export>CN<\/country-export>/);
-  assert.doesNotMatch(r.xml, /<country-export>VN<\/country-export>/);
+  assert.ok(r.missing.some((m) => m.field === "country-export for BP-H205"));
+});
+
+test("direct broker inputs cannot promote invalid HTSUS or line evidence into XML", async () => {
+  const s = sample();
+  const r = await processShipment(s, {
+    htsByStyle: { L1: "610910" },
+    lineEvidence: {
+      L1: {
+        manufacturerId: { value: "TOO-LONG-MANUFACTURER-ID", approved: true },
+        countryOfExport: { value: "ZZ", approved: true },
+      },
+    },
+  }, T);
+  assert.match(r.xml, /<tariff-no>610910<\/tariff-no>/, "the document-stated HS fragment remains traceable, but is not promoted to a classification");
+  assert.doesNotMatch(r.xml, /<manufacturer-id>TOO-LONG-MANUFACTURER-ID<\/manufacturer-id>/);
+  assert.doesNotMatch(r.xml, /<country-export>ZZ<\/country-export>/);
+  for (const field of ["HTSUS 10-digit for BP-T101", "manufacturer-id for BP-T101", "country-export for BP-T101"]) {
+    assert.ok(r.missing.some((m) => m.field === field && m.blocking), field);
+  }
+  assert.equal(r.readyToFile, false);
+  assert.ok(r.assumptions.some((a) => a.field === "HTSUS 10-digit for BP-T101" && a.status === "broker_confirm"));
+  assert.ok(r.assumptions.some((a) => a.field === "manufacturer-id BP-T101" && a.status === "broker_confirm"));
+  assert.ok(r.assumptions.some((a) => a.field === "country-export BP-T101" && a.status === "broker_confirm"));
 });
 
 // ================= H: XML integrity =================
@@ -65,6 +89,21 @@ test("a filer code does not silently invent an entry number", async () => {
   const r = await processShipment(sample(), { filerCode: "ABC" }, T);
   assert.ok(r.assumptions.some((a) => a.field === "entry-no" && /placeholder|not a real/i.test(a.basis)));
   assert.ok(r.missing.some((m) => m.field === "entry number"));
+});
+
+test("assumptions response contains no blank derived values", async () => {
+  const s = sample();
+  delete s.invoice.shipTo!.state;
+  delete s.bol.masterScac;
+  delete s.invoice.lines[0].manufacturer;
+  delete s.factory;
+  const r = await processShipment(s, {}, T);
+
+  assert.ok(r.assumptions.every((a) => a.field.trim() && a.value.trim() && a.basis.trim()));
+  assert.ok(!r.assumptions.some((a) => a.field === "state-destination" || a.field === "carrier-code" || a.field === "manufacturer-id BP-T101"));
+  assert.ok(r.missing.some((m) => m.field === "state-destination"));
+  assert.ok(r.missing.some((m) => m.field === "carrier-code"));
+  assert.ok(r.missing.some((m) => m.field === "manufacturer-id for BP-T101"));
 });
 
 // ================= I: logistics consistency =================

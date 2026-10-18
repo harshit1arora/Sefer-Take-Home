@@ -138,6 +138,35 @@ test("edit: a 6-digit HS edit is recorded but does not count as classification",
   assert.match(r["xml"], /<tariff-no>610990<\/tariff-no>/);
 });
 
+test("broker line evidence is explicit, approved, and survives edited regeneration", async () => {
+  const source = sample();
+  const unapproved = await buildEntryResponse(source, { today: TODAY, broker: { lineEvidence: {
+    L5: { manufacturerId: { value: "BDMFR-123", approved: false }, countryOfExport: { value: "BD", approved: false } },
+  } } });
+  assert.doesNotMatch(unapproved.xml, /<manufacturer-id>BDMFR-123<\/manufacturer-id>/);
+  assert.doesNotMatch(unapproved.xml, /<country-export>BD<\/country-export>/);
+  assert.ok(unapproved.missing.some((m) => m.field === "manufacturer-id for BP-P118S" && m.blocking));
+  assert.ok(unapproved.assumptions.some((a) => a.field === "country-export BP-P118S" && a.status === "broker_confirm"));
+
+  const edited = toFrontendShipment(source); edited.lines[4].description = "BROKER-EDITED SAMPLE DESCRIPTION";
+  const approved = await buildEntryResponse(source, { today: TODAY, edited, broker: { lineEvidence: {
+    L5: { manufacturerId: { value: "BDMFR-123", approved: true }, countryOfExport: { value: "BD", approved: true } },
+  } } });
+  assert.match(approved.xml, /<manufacturer-id>BDMFR-123<\/manufacturer-id>/);
+  assert.match(approved.xml, /<country-origin>BD<\/country-origin>[\s\S]*?<country-export>BD<\/country-export>/);
+  assert.ok(approved.assumptions.some((a) => a.field === "manufacturer-id BP-P118S" && a.status === "broker_supplied"));
+  assert.ok(!approved.missing.some((m) => m.field === "manufacturer-id for BP-P118S" || m.field === "country-export for BP-P118S"));
+  assert.ok(approved.edits.some((e) => e.field === "description"));
+});
+
+test("invalid broker line evidence is rejected rather than approved", async () => {
+  const r = await handleEntryUpload([pdf()], { broker: JSON.stringify({ lineEvidence: {
+    L5: { manufacturerId: { value: "bad id!", approved: true }, countryOfExport: { value: "ZZ", approved: true } },
+  } }) }, deps());
+  assert.equal(r.status, 400);
+  assert.equal(body(r)["code"], "BAD_REQUEST");
+});
+
 test("edit: changing a line amount keeps the printed amount and records a broker override", async () => {
   const r = body(await regen((fe) => { fe.lines[0].amount = 6840; }));
   const comps = r["valuation"].lines[0].components;
